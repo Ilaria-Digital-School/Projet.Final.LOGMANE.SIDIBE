@@ -1,118 +1,96 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import SEO from '../../components/Common/SEO';
 import LanguageSwitcher from '../../components/Common/LanguageSwitcher';
 
-// Landing Components
-import Hero from '../../components/Landing/Hero';
-import VitrinaForfaits from '../../components/Landing/VitrinaForfaits';
-import Mission from '../../components/Landing/Mission';
-import Features from '../../components/Landing/Features';
-import HowItWorks from '../../components/Landing/HowItWorks';
-import FAQ from '../../components/Landing/FAQ';
-import ContactForm from '../../components/Landing/ContactForm';
+// New Landing Components
+import MotoHero from '../../components/Landing/MotoHero';
+import BenefitsGrid from '../../components/Landing/BenefitsGrid';
+import HowItWorksSteps from '../../components/Landing/HowItWorksSteps';
+import RoadmapSection from '../../components/Landing/RoadmapSection';
+import DriverBanner from '../../components/Landing/DriverBanner';
 
 /**
  * LandingPage Component
- * Refactored to modular components for better maintainability and SPA-like behavior.
+ * Rebuilt to focus on passenger transport with a modern, high-conversion structure.
  */
 const LandingPage = () => {
     const navigate = useNavigate();
     const { t } = useTranslation();
+    const [scrolled, setScrolled] = useState(false);
 
-    // System colors (Consolidated)
+    // Consolidated system colors
     const colors = {
         primary: '#2563eb',
         secondary: '#059669',
-        accent: '#b45309',
     };
 
+    useEffect(() => {
+        const handleScroll = () => setScrolled(window.scrollY > 20);
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
     return (
-        <div style={{ minHeight: '100vh', background: '#ffffff' }}>
+        <div className="min-h-screen bg-white font-sans antialiased text-gray-900">
             <SEO
-                title={t('seo.landing_title')}
-                description={t('seo.landing_desc')}
+                title={t('seo.landing_title') || "MotoTX - Tu viaje seguro en Bamako"}
+                description={t('seo.landing_desc') || "La forma más rápida y segura de moverte por Bamako."}
             />
 
-            {/* Header / Nav */}
-            <header style={{
-                padding: '1.25rem 2rem',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                background: 'rgba(255, 255, 255, 0.95)',
-                backdropFilter: 'blur(10px)',
-                boxShadow: '0 1px 10px rgba(0,0,0,0.05)',
-                position: 'sticky',
-                top: 0,
-                zIndex: 100
-            }}>
-                <div
-                    style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer' }}
-                    onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                >
-                    <h1 className="hidden-seo">{t('seo.landing_h1')}</h1>
-                    <img src="/logo_clean.png" alt="MotoTX Logo" style={{ height: '2.75rem', objectFit: 'contain' }} />
-                    <span style={{ fontSize: '1.5rem', fontWeight: '900', color: colors.primary, letterSpacing: '-0.5px' }}>MotoTX</span>
-                </div>
-
-                <nav className="desktop-only" style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
-                    <a href="#mission" className="mtx-nav-link">{t('landing.mission_title')}</a>
-                    <a href="#how-it-works" className="mtx-nav-link">{t('landing.how_title')}</a>
-                    <a href="#vitrina" className="mtx-nav-link">{t('nav.forfaits')}</a>
-                    <a href="#faq" className="mtx-nav-link">{t('landing.faq_title_short')}</a>
-                    <a href="#contact" className="mtx-nav-link">{t('landing.contact_title')}</a>
-
-                    <div style={{ width: '1px', height: '24px', background: '#e5e7eb', margin: '0 0.5rem' }}></div>
-
-                    <LanguageSwitcher />
-
-                    <button
-                        onClick={() => navigate('/login')}
-                        className="btn btn--primary"
+            {/* Modern Transparent Header */}
+            <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white/90 backdrop-blur-md shadow-sm py-3' : 'bg-transparent py-5'
+                }`}>
+                <div className="container mx-auto px-6 flex justify-between items-center">
+                    <div
+                        className="flex items-center gap-3 cursor-pointer group"
+                        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                     >
-                        {t('common.login')}
-                    </button>
-                </nav>
+                        <img src="/logo_clean.png" alt="MotoTX Logo" className="h-10 w-10 object-contain transition-transform group-hover:rotate-12" />
+                        <span className="text-2xl font-black tracking-tighter text-blue-600">MotoTX</span>
+                    </div>
+
+                    <div className="flex items-center gap-6">
+                        <div className="hidden md:block">
+                            <LanguageSwitcher />
+                        </div>
+                        <button
+                            onClick={() => navigate('/login')}
+                            className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-2.5 rounded-xl transition-all shadow-lg shadow-blue-600/20 active:scale-95"
+                        >
+                            {t('common.login')}
+                        </button>
+                    </div>
+                </div>
             </header>
 
             <main>
-                <Hero colors={colors} />
-                <Mission colors={colors} />
-                <Features colors={colors} />
-                <VitrinaForfaits colors={colors} />
-                <HowItWorks colors={colors} />
-                <FAQ colors={colors} />
-                <ContactForm colors={colors} />
+                <MotoHero colors={colors} />
+                <BenefitsGrid />
+                <HowItWorksSteps />
+                <RoadmapSection />
+                <DriverBanner />
             </main>
 
-            {/* Footer */}
-            <footer style={{ padding: '3rem 2rem', background: '#1f2937', color: 'white', textAlign: 'center' }}>
-                <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-                    <div style={{ marginBottom: '2rem' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
-                            <img src="/logo_clean.png" alt="MotoTX" style={{ height: '3rem', objectFit: 'contain', background: 'white', borderRadius: '50%', padding: '0.25rem' }} />
-                            <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: 'white', margin: 0 }}>MotoTX</h2>
+            {/* Basic Footer */}
+            <footer className="bg-gray-50 border-t border-gray-100 py-12">
+                <div className="container mx-auto px-6">
+                    <div className="flex flex-col md:flex-row justify-between items-center gap-8">
+                        <div className="flex items-center gap-2">
+                            <img src="/logo_clean.png" alt="MotoTX" className="h-8 w-8 grayscale opacity-50" />
+                            <span className="text-lg font-bold text-gray-400">MotoTX</span>
                         </div>
-                        <p style={{ opacity: 0.8, maxWidth: '600px', margin: '0 auto' }}>
-                            {t('landing.footer_desc')}
-                        </p>
-                    </div>
-                    <div style={{
-                        borderTop: '1px solid rgba(255,255,255,0.1)',
-                        paddingTop: '2rem',
-                        opacity: 0.7,
-                        fontSize: '0.9rem'
-                    }}>
-                        <p style={{ margin: '0 0 0.5rem 0' }}>
-                            {t('landing.footer_copyright')}
-                        </p>
-                        <div style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem', flexWrap: 'wrap' }}>
-                            <a href="/privacy" className="mtx-footer-link">{t('landing.privacy_policy')}</a>
-                            <a href="/terms" className="mtx-footer-link">{t('landing.terms_conditions')}</a>
-                            <a href="/cgu" className="mtx-footer-link">{t('landing.cgu')}</a>
+
+                        <div className="flex gap-8 text-sm font-medium text-gray-500">
+                            <a href="/privacy" className="hover:text-blue-600 transition-colors uppercase tracking-widest text-[10px]">Privacidad</a>
+                            <a href="/terms" className="hover:text-blue-600 transition-colors uppercase tracking-widest text-[10px]">Términos</a>
+                            <a href="/contact" className="hover:text-blue-600 transition-colors uppercase tracking-widest text-[10px]">Soporte</a>
                         </div>
+
+                        <p className="text-gray-400 text-xs">
+                            © {new Date().getFullYear()} MotoTX. Todos los derechos reservados.
+                        </p>
                     </div>
                 </div>
             </footer>

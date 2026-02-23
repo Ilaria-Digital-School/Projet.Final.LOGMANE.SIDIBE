@@ -16,7 +16,12 @@ import { useTranslation } from 'react-i18next';
 const DashboardCharts = ({ data }) => {
     const { t } = useTranslation();
 
-    if (!Array.isArray(data) || data.length === 0) {
+    if (!Array.isArray(data)) {
+        console.error('DashboardCharts received non-array data:', data);
+        return <div className="p-4 text-center text-red-500">Error: Invalid chart data format</div>;
+    }
+
+    if (data.length === 0) {
         return <div className="p-4 text-center text-gray-500">{t('admin_dashboard.charts.no_data')}</div>;
     }
 

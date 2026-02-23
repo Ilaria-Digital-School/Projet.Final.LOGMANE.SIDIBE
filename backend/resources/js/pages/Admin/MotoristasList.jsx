@@ -23,19 +23,23 @@ const MotoristasList = () => {
     const fetchMotoristas = async () => {
         try {
             const response = await axios.get('/api/admin/users?rol=motorista');
+
+            // Defensive coding to handle both straight arrays and paginated objects
+            let data = [];
             if (response.data && Array.isArray(response.data)) {
-                setMotoristas(response.data.filter(u => u.rol === 'motorista'));
-            } else if (response.data && response.data.data) {
-                setMotoristas(response.data.data.filter(u => u.rol === 'motorista'));
+                data = response.data;
+            } else if (response.data && Array.isArray(response.data.data)) {
+                data = response.data.data;
+            } else if (response.data && typeof response.data === 'object') {
+                // Handle case where it might be an object with numeric keys (keyBy)
+                data = Object.values(response.data);
             }
+
+            setMotoristas(data.filter(u => u.rol === 'motorista'));
         } catch (error) {
-            // Fallback mock data for demonstration
+            console.error("Error fetching motoristas:", error);
             toast.error(t('admin_dashboard.motoristas.fetch_error'));
         } finally {
-            setMotoristas([
-                { id: 1, name: 'Amadou Koné', email: 'amadou@test.com', created_at: '2025-12-01', motorista_perfil: { estado_validacion: 'pendiente', marca_vehiculo: 'KTM 125' } },
-                { id: 2, name: 'Seydou Keita', email: 'seydou@test.com', created_at: '2025-12-02', motorista_perfil: { estado_validacion: 'aprobado', marca_vehiculo: 'Yamaha' } }
-            ]);
             setLoading(false);
         }
     };

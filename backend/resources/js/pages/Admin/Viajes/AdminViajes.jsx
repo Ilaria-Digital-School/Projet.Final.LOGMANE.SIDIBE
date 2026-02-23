@@ -27,8 +27,17 @@ const AdminViajes = () => {
     const fetchViajes = async () => {
         try {
             const response = await axios.get('/api/admin/viajes');
-            setViajes(response.data);
+            let data = [];
+            if (Array.isArray(response.data)) {
+                data = response.data;
+            } else if (response.data && Array.isArray(response.data.data)) {
+                data = response.data.data;
+            } else if (response.data && typeof response.data === 'object') {
+                data = Object.values(response.data);
+            }
+            setViajes(data);
         } catch (error) {
+            console.error("Error fetching trips:", error);
             toast.error(t('common.error'));
         } finally {
             setLoading(false);

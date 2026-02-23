@@ -18,9 +18,20 @@ const AdminUserApproval = () => {
     const fetchPendingUsers = async () => {
         try {
             const response = await axios.get('/api/admin/users/pending');
-            setUsers(response.data);
+            // Defensive coding to handle different response formats
+            let data = [];
+            if (Array.isArray(response.data)) {
+                data = response.data;
+            } else if (response.data && Array.isArray(response.data.data)) {
+                data = response.data.data;
+            } else if (response.data && typeof response.data === 'object') {
+                data = Object.values(response.data);
+            }
+            setUsers(data);
         } catch (error) {
+            console.error("Error fetching pending users:", error);
             toast.error(t('common.error_loading_data'));
+            setUsers([]);
         } finally {
             setLoading(false);
         }
@@ -30,16 +41,16 @@ const AdminUserApproval = () => {
         try {
             await axios.patch(`/api/admin/users/${userId}/status`, { status });
             toast.success(t(`admin_dashboard.users.status_updated_${status}`));
-            setUsers(users.filter(u => u.id !== userId));
+            setUsers(prev => Array.isArray(prev) ? prev.filter(u => u.id !== userId) : []);
         } catch (error) {
             toast.error(t('common.error_updating_status'));
         }
     };
 
-    const filteredUsers = users.filter(user =>
-        user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filteredUsers = Array.isArray(users) ? users.filter(user =>
+        user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.email?.toLowerCase().includes(searchTerm.toLowerCase())
+    ) : [];
 
     if (loading) return <div className="text-center p-20">{t('common.loading')}</div>;
 

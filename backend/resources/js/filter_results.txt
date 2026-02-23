@@ -1,0 +1,6 @@
+pages\Admin\MotoristasList.jsx:            setMotoristas(data.filter(u => u.rol === 'motorista'));
+pages\Admin\Users\AdminUserApproval.jsx:            setUsers(prev => Array.isArray(prev) ? prev.filter(u => u.id !== userId) : []);
+pages\Admin\Users\AdminUserApproval.jsx:    const filteredUsers = Array.isArray(users) ? users.filter(user =>
+pages\Admin\Viajes\AdminViajes.jsx:        : safeViajes.filter(v => v.estado === filter);
+pages\Cliente\ClienteDashboard.jsx:    const forfaitsActivos = user?.cliente_forfaits?.filter(f => f.estado === 'activo') || [];
+pages\Motorista\MotoristaHistory.jsx:            const ratedTrips = Array.isArray(trips) ? trips.filter(v => v.calificacion) : [];

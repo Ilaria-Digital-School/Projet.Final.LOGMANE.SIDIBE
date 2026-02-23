@@ -40,11 +40,20 @@ const MotoristaHistory = () => {
         setLoading(true);
         try {
             const response = await axios.get('/api/viajes/historial');
-            const trips = response.data.data || [];
+            // Defensive coding to handle different response formats
+            let trips = [];
+            if (response.data && Array.isArray(response.data.data)) {
+                trips = response.data.data;
+            } else if (response.data && Array.isArray(response.data)) {
+                trips = response.data;
+            } else if (response.data && typeof response.data === 'object') {
+                trips = Object.values(response.data.data || response.data);
+            }
+
             setViajes(trips);
 
-            // Calculate stats
-            const ratedTrips = trips.filter(v => v.calificacion);
+            // Calculate stats safely
+            const ratedTrips = Array.isArray(trips) ? trips.filter(v => v.calificacion) : [];
             const totalRating = ratedTrips.reduce((sum, v) => sum + (v.calificacion?.puntuacion || 0), 0);
             const avgRating = ratedTrips.length > 0 ? (totalRating / ratedTrips.length).toFixed(1) : 0;
 
