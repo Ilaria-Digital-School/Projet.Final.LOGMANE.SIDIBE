@@ -468,7 +468,10 @@
         "tap_map_instruction": "You can also tap directly on the map to mark points.",
         "request_trip": "Request Trip",
         "your_rating": "Your Rating",
-        "rate_trip": "Rate Trip"
+        "rate_trip": "Rate Trip",
+        "total_trips": "Total trips",
+        "completed": "Completed",
+        "rated": "Rated"
     },
     "client_forfaits": {
         "title": "Buy Forfaits",
@@ -486,7 +489,17 @@
         "payment_error": "Payment processing error",
         "timeout_error": "Timeout. Please check your balance.",
         "selected": "SELECTED",
-        "back": "Back"
+        "back": "Back",
+        "checkout_title": "Complete Purchase",
+        "select_gateway": "Select your payment method",
+        "gateway_om": "Orange Money",
+        "gateway_moov": "Moov Money",
+        "confirm_details": "Order Summary",
+        "pay_now": "Pay Now",
+        "total_to_pay": "Total to pay",
+        "pack_name": "Package",
+        "trip_units": "Trips included",
+        "selected_gateway": "Selected payment method"
     },
     "plans": {
         "Diario": "Daily",
@@ -534,7 +547,9 @@
         "enter_password_confirm": "Please enter your password to confirm:",
         "default_plan_name": "Standard Plan",
         "account_deleted": "Account deleted successfully",
-        "delete_error": "Error deleting account"
+        "delete_error": "Error deleting account",
+        "danger_zone_desc": "This action is permanent and irreversible",
+        "delete_warning": "Your account, personal data, active forfaits, and trip history will be deleted."
     },
     "profile": {
         "preferences": "Preferences",
