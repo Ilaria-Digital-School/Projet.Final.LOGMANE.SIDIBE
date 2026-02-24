@@ -32,6 +32,25 @@ class User extends Authenticatable implements JWTSubject
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, SoftDeletes;
+    
+    /**
+     * [ES] Hook que se ejecuta al crear un usuario.
+     *      Si el rol es 'motorista', crea automáticamente su perfil con viajes de prueba.
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::created(function ($user) {
+            if ($user->rol === 'motorista') {
+                $user->motorista_perfil()->create([
+                    'estado_actual' => 'inactivo',
+                    'viajes_prueba_restantes' => 5, // [NEW] 5 trial trips for new drivers
+                    'billetera' => 0,
+                ]);
+            }
+        });
+    }
 
     /**
      * The attributes that are mass assignable.

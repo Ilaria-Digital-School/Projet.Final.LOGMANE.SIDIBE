@@ -163,29 +163,32 @@ const MotoristaDashboard = () => {
         const promise = axios.put('/api/motorista/status', { estado_actual: newStatus });
 
         toast.promise(promise, {
-            loading: t('common.saving') || 'Updating...',
+            loading: t('common.saving') || 'Actualizando...',
             success: (response) => {
                 if (response.data && response.data.data) {
                     setProfile(prev => ({ ...prev, ...response.data.data }));
                 }
-                return newIsOnline ? t('driver_dashboard.online_msg') : t('driver_dashboard.offline_msg');
+                const msg = newIsOnline ? t('driver_dashboard.online_msg') : t('driver_dashboard.offline_msg');
+                return msg;
             },
             error: (err) => {
                 // Revert on error
                 setIsOnline(!newIsOnline);
-                if (err.response && err.response.status === 403) {
-                    setTimeout(() => navigate('/motorista/suscripciones'), 1500);
-                    return t('driver_dashboard.subscription_required');
+
+                const errorMsg = err.response?.data?.error || '';
+
+                if (errorMsg.includes('Subscription required') || err.response?.status === 403) {
+                    // Open a small delay before navigating so user can read toast
+                    setTimeout(() => navigate('/motorista/suscripciones'), 2000);
+                    return t('driver_dashboard.subscription_required') || 'Requiere suscripción activa';
                 }
-                return t('driver_dashboard.update_error');
+                return t('driver_dashboard.update_error') || 'Error al actualizar estado';
             },
             finally: () => {
-                // Unlock the spinner quickly so the button feels responsive
                 setTimeout(() => {
                     setIsTogglingStatus(false);
                 }, 500);
-                // Keep the polling lock for 12s — longer than the 10s poll interval.
-                // This guarantees the background GET cannot overwrite a fresh manual toggle.
+                // Keep the polling lock for 12s
                 setTimeout(() => {
                     statusLockRef.current = false;
                 }, 12000);

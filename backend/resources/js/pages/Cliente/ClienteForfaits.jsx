@@ -109,7 +109,7 @@ const ClienteForfaits = () => {
         setTimeout(() => {
             setSelectedForfait(null);
             setPhoneNumber('');
-            navigate('/cliente/dashboard');
+            navigate('/cliente');
         }, 2000);
     };
 
