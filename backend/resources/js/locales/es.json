@@ -86,6 +86,7 @@
         "role": "Rol",
         "date": "Fecha",
         "actions": "Acciones",
+        "rights_reserved": "Todos los derechos reservados.",
         "approve": "Aprobar",
         "reject": "Rechazar",
         "search": "Buscar...",
@@ -340,11 +341,11 @@
     },
     "landing": {
         "debug_test": "VERSIÓN ESPAÑOLA ACTIVA",
-        "hero_title": "Tu viaje seguro y rápido por Bamako",
+        "hero_title": "Tu viaje <1>seguro y rápido</1> por Bamako",
         "hero_subtitle_modern": "Olvídate del tráfico y las esperas. Con MotoTX, llegas a tu destino de forma puntual, económica y con los más altos estándares de seguridad en cada trayecto.",
         "btn_request_trip": "Pedir un viaje",
         "btn_want_to_drive": "Quiero conducir",
-        "hero_trust": "Más de <span class='font-bold text-gray-900'>+500 viajeros</span> confían en nosotros diariamente",
+        "hero_trust": "Más de <1>+500 viajeros</1> confían en nosotros diariamente",
         "benefits": {
             "title1": "Seguridad primero",
             "desc1": "Todos nuestros conductores están verificados y cuentan con equipo de seguridad completo para protegerte.",

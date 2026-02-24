@@ -1,49 +1,35 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-/**
- * LanguageSwitcher Component
- *
- * [ES] Selector global de idioma que utiliza i18next para cambiar la localización de la app.
- *      Sincroniza el estado visual con el idioma actualmente cargado.
- *
- * [FR] Sélecteur de langue global utilisant i18next pour changer la localisation de l'application.
- *      Synchronise l'état visuel avec la langue actuellement chargée.
- */
 const LanguageSwitcher = () => {
     const { i18n } = useTranslation();
 
     const languages = [
-        { code: 'es', label: 'ES', name: 'Español' },
-        { code: 'fr', label: 'FR', name: 'Français' },
-        { code: 'en', label: 'EN', name: 'English' }
+        { code: 'es', label: 'ES' },
+        { code: 'fr', label: 'FR' },
+        { code: 'en', label: 'EN' }
     ];
 
     return (
-        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }} translate="no">
-            {languages.map((lang) => (
-                <button
-                    key={lang.code}
-                    onClick={() => {
-                        i18n.changeLanguage(lang.code);
-                    }}
-                    style={{
-                        padding: '0.25rem 0.5rem',
-                        borderRadius: '0.25rem',
-                        border: '1px solid #e5e7eb',
-                        background: i18n.language.startsWith(lang.code) ? '#2563eb' : 'white',
-                        color: i18n.language.startsWith(lang.code) ? 'white' : '#374151',
-                        fontSize: '0.75rem',
-                        fontWeight: 'bold',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s'
-                    }}
-                    title={lang.name}
-                    translate="no"
-                >
-                    {lang.label}
-                </button>
-            ))}
+        <div className="flex items-center gap-1 bg-gray-100/50 p-1 rounded-xl backdrop-blur-sm border border-gray-200/50" translate="no">
+            {languages.map((lang) => {
+                const isActive = i18n.language.startsWith(lang.code);
+                return (
+                    <button
+                        key={lang.code}
+                        onClick={() => i18n.changeLanguage(lang.code)}
+                        className={`
+                            px-2 py-1.5 rounded-lg text-[10px] font-black transition-all
+                            ${isActive
+                                ? 'bg-blue-600 text-white shadow-sm scale-105'
+                                : 'text-gray-500 hover:bg-white hover:text-blue-600'}
+                        `}
+                        translate="no"
+                    >
+                        {lang.label}
+                    </button>
+                );
+            })}
         </div>
     );
 };

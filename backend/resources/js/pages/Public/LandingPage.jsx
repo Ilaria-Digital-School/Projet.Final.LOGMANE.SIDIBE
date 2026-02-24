@@ -50,22 +50,20 @@ const LandingPage = () => {
             {/* Modern Transparent Header */}
             <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white/90 backdrop-blur-md shadow-sm py-3' : 'bg-transparent py-5'
                 }`}>
-                <div className="container mx-auto px-6 flex justify-between items-center">
+                <div className="container mx-auto px-4 flex justify-between items-center">
                     <div
-                        className="flex items-center gap-3 cursor-pointer group"
+                        className="flex items-center gap-2 cursor-pointer group shrink-0"
                         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                     >
-                        <img src="/logo_clean.png" alt="MotoTX Logo" className="h-10 w-10 object-contain transition-transform group-hover:rotate-12" />
-                        <span className="text-2xl font-black tracking-tighter text-blue-600">MotoTX</span>
+                        <img src="/logo_clean.png" alt="MotoTX Logo" className="h-8 w-8 md:h-10 md:w-10 object-contain transition-transform group-hover:rotate-12" />
+                        <span className="text-xl md:text-2xl font-black tracking-tighter text-blue-600 hidden sm:block">MotoTX</span>
                     </div>
 
-                    <div className="flex items-center gap-6">
-                        <div className="hidden md:block">
-                            <LanguageSwitcher />
-                        </div>
+                    <div className="flex items-center gap-1.5 md:gap-6">
+                        <LanguageSwitcher />
                         <button
                             onClick={() => navigate('/login')}
-                            className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-2.5 rounded-xl transition-all shadow-lg shadow-blue-600/20 active:scale-95"
+                            className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 md:px-6 py-2 md:py-2.5 rounded-xl transition-all shadow-lg shadow-blue-600/20 active:scale-95 text-xs md:text-base shrink-0"
                         >
                             {t('common.login')}
                         </button>

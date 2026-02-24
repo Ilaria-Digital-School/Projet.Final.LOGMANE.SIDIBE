@@ -1,11 +1,11 @@
 {
     "landing": {
         "debug_test": "ENGLISH VERSION ACTIVE",
-        "hero_title": "Your safe and fast ride in Bamako",
+        "hero_title": "Your <1>safe and fast</1> ride in Bamako",
         "hero_subtitle_modern": "Forget about traffic and waiting. With MotoTX, you arrive at your destination punctually, economically and with the highest safety standards on every trip.",
         "btn_request_trip": "Request a ride",
         "btn_want_to_drive": "I want to drive",
-        "hero_trust": "More than <span class='font-bold text-gray-900'>+500 travelers</span> trust us daily",
+        "hero_trust": "More than <1>+500 travelers</1> trust us daily",
         "benefits": {
             "title1": "Safety first",
             "desc1": "All our drivers are verified and have full safety equipment to protect you.",
