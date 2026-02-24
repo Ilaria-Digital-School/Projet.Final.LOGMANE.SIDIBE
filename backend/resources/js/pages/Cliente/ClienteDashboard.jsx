@@ -355,13 +355,17 @@ const ClienteDashboard = () => {
 
             {/* Header */}
             <header className="mtx-header">
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flex: 1, minWidth: 0 }}>
                     <img src="/logo.png" alt="MotoTX Logo" className="mtx-header-logo" />
-                    <div>
-                        <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: 'var(--primary-color)', margin: 0 }}>MotoTX</h1>
-                        <span style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>
+                    <div style={{ minWidth: 0 }}>
+                        <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: 'var(--primary-color)', margin: 0, whiteSpace: 'nowrap' }}>MotoTX</h1>
+                        <span style={{ fontSize: '0.875rem', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}>
                             {user?.email === 'cliente@test.com' ? t('auth.role_client') + ' (Demo)' : user?.name || t('auth.role_client')}
                         </span>
+                    </div>
+                    {/* Badge inside brand row — shown on mobile only via CSS */}
+                    <div className="mobile-balance-badge" style={{ marginLeft: 'auto', flexShrink: 0 }}>
+                        <Badge variant="premium">{viajesDisponibles} 🎫</Badge>
                     </div>
                 </div>
 
@@ -370,26 +374,17 @@ const ClienteDashboard = () => {
                     <Badge variant="premium">
                         {t('client_dashboard.trips_badge', { count: viajesDisponibles })}
                     </Badge>
-
                     <Button onClick={() => navigate('/cliente/historial')} variant="outline" className="nav-btn-history">
                         {t('client_dashboard.history')}
                     </Button>
-
                     <Button onClick={() => navigate('/cliente/perfil')} variant="outline" className="nav-btn-profile">
                         {t('client_dashboard.profile')}
                     </Button>
-
                     <Button onClick={handleLogout} variant="error" className="nav-btn-logout">
                         {t('common.logout')}
                     </Button>
-
                     <div className="nav-divider" style={{ width: '1px', height: '2rem', background: 'var(--border-color)', margin: '0 0.5rem' }}></div>
                     <LanguageSwitcher />
-                </div>
-
-                {/* Mobile Balance Badge (Visible via CSS) */}
-                <div className="mobile-balance-badge">
-                    <Badge variant="premium">{viajesDisponibles} 🎫</Badge>
                 </div>
             </header>
 
