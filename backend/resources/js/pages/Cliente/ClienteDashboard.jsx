@@ -355,18 +355,25 @@ const ClienteDashboard = () => {
 
             {/* Header */}
             <header className="mtx-header">
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flex: 1, minWidth: 0 }}>
+                <div className="mtx-header-brand">
                     <img src="/logo.png" alt="MotoTX Logo" className="mtx-header-logo" />
-                    <div style={{ minWidth: 0 }}>
-                        <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: 'var(--primary-color)', margin: 0, whiteSpace: 'nowrap' }}>MotoTX</h1>
-                        <span style={{ fontSize: '0.875rem', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}>
+                    <div className="mtx-header-text">
+                        <h1 className="header-title">MotoTX</h1>
+                        <span className="header-subtitle">
                             {user?.email === 'cliente@test.com' ? t('auth.role_client') + ' (Demo)' : user?.name || t('auth.role_client')}
                         </span>
                     </div>
                 </div>
 
+                {/* Mobile Balance Badge (Right side of header on mobile) */}
+                <div className="mobile-balance-badge">
+                    <Badge variant="premium">
+                        {viajesDisponibles} 🎫
+                    </Badge>
+                </div>
+
                 {/* Desktop/Tablet Nav */}
-                <div className="desktop-nav" style={{ gap: '1rem', alignItems: 'center' }}>
+                <div className="desktop-nav">
                     <Badge variant="premium">
                         {t('client_dashboard.trips_badge', { count: viajesDisponibles })}
                     </Badge>
@@ -379,7 +386,7 @@ const ClienteDashboard = () => {
                     <Button onClick={handleLogout} variant="error" className="nav-btn-logout">
                         {t('common.logout')}
                     </Button>
-                    <div className="nav-divider" style={{ width: '1px', height: '2rem', background: 'var(--border-color)', margin: '0 0.5rem' }}></div>
+                    <div className="nav-divider"></div>
                     <LanguageSwitcher />
                 </div>
             </header>

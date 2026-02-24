@@ -85,9 +85,9 @@ const ClienteProfile = () => {
         <div className="dashboard-container">
             <SEO title={t('client_dashboard.profile')} />
 
-            {/* ─── Header ─── */}
+            {/* Header */}
             <header className="mtx-header">
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flex: 1, minWidth: 0 }}>
+                <div className="mtx-header-brand">
                     <div style={{
                         background: 'var(--primary-color)',
                         width: '2.5rem', height: '2.5rem',
@@ -95,17 +95,20 @@ const ClienteProfile = () => {
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         fontSize: '1.25rem', flexShrink: 0
                     }}>👤</div>
-                    <div style={{ minWidth: 0 }}>
+                    <div className="mtx-header-text">
                         <h1 className="header-title">{t('client_dashboard.profile')}</h1>
-                        <span className="header-subtitle" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}>
+                        <span className="header-subtitle">
                             {formData.name || t('auth.role_client')}
                         </span>
                     </div>
-                    {/* Badge inside brand row for mobile */}
-                    <div className="mobile-balance-badge" style={{ marginLeft: 'auto', flexShrink: 0 }}>
-                        <Badge variant="premium">{totalTripsLeft} 🎫</Badge>
-                    </div>
                 </div>
+
+                {/* Mobile Balance Badge */}
+                <div className="mobile-balance-badge">
+                    <Badge variant="premium">{totalTripsLeft} 🎫</Badge>
+                </div>
+
+                {/* Desktop/Tablet Nav */}
                 <div className="desktop-nav">
                     <Badge variant="premium">{totalTripsLeft} 🎫</Badge>
                     <Button variant="outline" onClick={() => navigate('/cliente')} label={t('nav.dashboard')}>
@@ -114,9 +117,6 @@ const ClienteProfile = () => {
                     <Button variant="error" onClick={handleLogout} label={t('common.logout')}>
                         {t('common.logout')}
                     </Button>
-                </div>
-                <div className="mobile-balance-badge">
-                    <Badge variant="premium">{totalTripsLeft} 🎫</Badge>
                 </div>
             </header>
 
