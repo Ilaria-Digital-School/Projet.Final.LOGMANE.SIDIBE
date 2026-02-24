@@ -7,7 +7,6 @@ import { useTranslation } from 'react-i18next';
 import SEO from '../../components/Common/SEO';
 import { Card, Button, Badge } from '../../components/Common/UIComponents';
 import { User, Mail, Phone, Settings, ShieldCheck, Bike, Calendar, Star, LogOut, LayoutDashboard, History, CheckCircle } from 'lucide-react';
-import '../../../css/components.css';
 
 /**
  * MotoristaProfile Component
