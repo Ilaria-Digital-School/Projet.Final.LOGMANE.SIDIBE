@@ -75,7 +75,8 @@
         "model": "Modelo",
         "year": "Año",
         "color": "Color",
-        "vehicle_support_note": "La información del vehículo es validada por soporte."
+        "vehicle_support_note": "La información del vehículo es validada por soporte.",
+        "member_since": "Miembro desde {{year}}"
     },
     "common": {
         "login": "Iniciar Sesión",

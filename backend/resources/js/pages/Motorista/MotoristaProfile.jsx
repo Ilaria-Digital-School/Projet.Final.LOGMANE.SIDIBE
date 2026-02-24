@@ -156,7 +156,7 @@ const MotoristaProfile = () => {
                                 </Badge>
                                 <div className="member-since">
                                     <Calendar size={12} />
-                                    <span>{t('landing.how_title').includes('?') ? 'Miembre' : 'Membre'} depuis {memberSince}</span>
+                                    <span>{t('driver_dashboard.member_since', { year: memberSince })}</span>
                                 </div>
                             </div>
                         </div>
