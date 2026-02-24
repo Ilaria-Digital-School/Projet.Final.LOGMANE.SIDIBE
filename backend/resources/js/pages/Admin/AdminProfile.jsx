@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useTranslation } from 'react-i18next';
-import { Card, Button } from '../../components/Common/UI';
+import { Card, Button } from '../../components/Common/UIComponents';
 
 /**
  * AdminProfile Component
