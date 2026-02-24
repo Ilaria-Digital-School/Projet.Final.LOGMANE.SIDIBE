@@ -108,7 +108,7 @@ const MotoristaProfile = () => {
                     <LayoutDashboard size={20} />
                     {t('nav.dashboard')}
                 </Button>
-                <Button variant="ghost" onClick={() => navigate('/motorista/history')} label={t('client_dashboard.history')}>
+                <Button variant="ghost" onClick={() => navigate('/motorista/historial')} label={t('client_dashboard.history')}>
                     <History size={20} />
                     {t('client_dashboard.history')}
                 </Button>

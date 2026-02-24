@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import SEO from '../../components/Common/SEO';
 import { Card, Button, Badge } from '../../components/Common/UIComponents';
-import { LayoutDashboard, History, User, LogOut } from 'lucide-react';
+import { LayoutDashboard, History, User, LogOut, Clock, CheckCircle, Calendar, Star, MapPin } from 'lucide-react';
 import '../../../css/components.css';
 
 /**
@@ -143,102 +143,138 @@ const MotoristaHistory = () => {
             </nav>
 
             <main className="main-content-centered">
-                {/* Stats Cards */}
-                <div className="stats-row" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
-                    <Card style={{ border: '2px solid var(--secondary-color)' }}>
-                        <div className="stat-label" style={{ fontSize: '0.875rem', fontWeight: '600' }}>
-                            {t('driver_dashboard.completed_trips')}
-                        </div>
-                        <div className="stat-value" style={{ fontSize: '3rem', color: 'var(--secondary-color)' }}>
-                            {stats.total}
-                        </div>
-                    </Card>
-                    <Card style={{ border: '2px solid var(--accent-color)' }}>
-                        <div className="stat-label" style={{ fontSize: '0.875rem', fontWeight: '600' }}>
-                            {t('driver_dashboard.average_rating')}
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                            <div className="stat-value" style={{ fontSize: '3rem', color: 'var(--accent-color)' }}>
-                                {stats.average}
+                {/* Premium Stats Row */}
+                <div className="driver-stats-grid animate-in fade-in slide-in-from-bottom-4">
+                    <div className="stat-card-premium earnings">
+                        <div className="stat-card-inner">
+                            <div className="stat-icon-wrapper">
+                                <Star size={24} fill="currentColor" />
                             </div>
-                            <div style={{ fontSize: '2rem', color: 'var(--accent-color)' }}>★</div>
+                            <div className="stat-content">
+                                <span className="stat-label-modern">{t('driver_dashboard.average_rating')}</span>
+                                <div className="stat-value-modern">
+                                    {stats.average} <span className="stat-subtext">/ 5.0</span>
+                                </div>
+                            </div>
                         </div>
-                    </Card>
+                    </div>
+
+                    <div className="stat-card-premium trips">
+                        <div className="stat-card-inner">
+                            <div className="stat-icon-wrapper">
+                                <History size={24} />
+                            </div>
+                            <div className="stat-content">
+                                <span className="stat-label-modern">{t('driver_dashboard.completed_trips')}</span>
+                                <div className="stat-value-modern">
+                                    {stats.total} <span className="stat-subtext">trips</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                {/* Trip List */}
+                <div className="history-section-header">
+                    <h2 className="section-title-modern">
+                        <Calendar size={20} /> {t('client_dashboard.history')}
+                    </h2>
+                </div>
+
+                {/* Activity timeline list */}
                 {loading ? (
-                    <div className="loading-state">
-                        {t('common.loading')}
+                    <div className="loading-state-premium">
+                        <div className="spinner-modern"></div>
+                        <span>{t('common.loading')}</span>
                     </div>
                 ) : viajes.length === 0 ? (
-                    <Card className="empty-state">
-                        <div className="empty-icon">📋</div>
-                        <p className="empty-text">
-                            {t('client_dashboard.no_trips')}
-                        </p>
+                    <Card className="empty-state-card">
+                        <div className="empty-state-icon">
+                            <History size={48} className="opacity-20" />
+                        </div>
+                        <h3 className="empty-title">{t('client_dashboard.no_trips')}</h3>
+                        <p className="empty-desc">Your activity journal is waiting for your first ride.</p>
+                        <Button variant="primary" onClick={() => navigate('/motorista')}>
+                            Ir al Dashboard
+                        </Button>
                     </Card>
                 ) : (
-                    <div className="history-grid" style={{ display: 'grid', gap: '1.5rem' }}>
-                        {Array.isArray(viajes) && viajes.map((viaje) => (
-                            <Card key={viaje.id} className="history-item">
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '1.5rem' }}>
-                                    <div>
-                                        <div className="history-date" style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
-                                            {new Date(viaje.updated_at).toLocaleDateString('es-ES', {
-                                                year: 'numeric',
-                                                month: 'long',
-                                                day: 'numeric',
-                                                hour: '2-digit',
-                                                minute: '2-digit'
-                                            })}
-                                        </div>
-                                        <div className="history-client" style={{ fontSize: '1.25rem', fontWeight: 'bold', color: 'var(--text-main)' }}>
-                                            {t('client_dashboard.client')}: {viaje.cliente?.name || 'N/A'}
-                                        </div>
-                                    </div>
-                                    <Badge variant="secondary">Completado</Badge>
+                    <div className="activity-timeline">
+                        {Array.isArray(viajes) && viajes.map((viaje, index) => (
+                            <div key={viaje.id} className="timeline-item-wrapper animate-in fade-in slide-in-from-left-4" style={{ animationDelay: `${index * 0.05}s` }}>
+                                <div className="timeline-marker">
+                                    <div className="marker-dot"></div>
+                                    <div className="marker-line"></div>
                                 </div>
 
-                                <div className="trip-details-grid" style={{ background: 'var(--bg-light)', padding: '1rem', borderRadius: '0.5rem', marginBottom: '1.5rem' }}>
-                                    <div className="detail-item">
-                                        <div className="detail-label">{t('client_dashboard.origin')}</div>
-                                        <div className="detail-value" style={{ fontSize: '0.9rem' }}>
-                                            {viaje.origen || `${safeFixed(viaje.origen_lat)}, ${safeFixed(viaje.origen_lng)}`}
+                                <Card className="timeline-content-card">
+                                    <div className="trip-card-header">
+                                        <div className="trip-time-box">
+                                            <Clock size={14} />
+                                            <span>
+                                                {new Date(viaje.updated_at).toLocaleDateString('es-ES', {
+                                                    day: 'numeric',
+                                                    month: 'short',
+                                                    hour: '2-digit',
+                                                    minute: '2-digit'
+                                                })}
+                                            </span>
                                         </div>
+                                        <Badge variant="success" className="badge--sm">
+                                            <CheckCircle size={12} /> {t('common.completed')}
+                                        </Badge>
                                     </div>
-                                    <div className="detail-item">
-                                        <div className="detail-label">{t('client_dashboard.destination')}</div>
-                                        <div className="detail-value" style={{ fontSize: '0.9rem' }}>
-                                            {viaje.destino || `${safeFixed(viaje.destino_lat)}, ${safeFixed(viaje.destino_lng)}`}
-                                        </div>
-                                    </div>
-                                </div>
 
-                                {/* Rating Section */}
-                                {viaje.calificacion ? (
-                                    <div className="rating-display" style={{ padding: '1.5rem', background: 'rgba(245, 158, 11, 0.1)', borderRadius: '0.75rem', borderLeft: '4px solid var(--accent-color)' }}>
-                                        <div style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginBottom: '0.75rem', fontWeight: '600' }}>
-                                            {t('driver_dashboard.rating_received')}
-                                        </div>
-                                        {renderStars(viaje.calificacion.puntuacion)}
-                                        {viaje.calificacion.comentario && (
-                                            <div className="rating-comment" style={{ marginTop: '1rem', fontSize: '0.95rem', color: 'var(--text-main)', fontStyle: 'italic', padding: '0.75rem', background: 'white', borderRadius: '0.5rem' }}>
-                                                "{viaje.calificacion.comentario}"
+                                    <div className="trip-main-info">
+                                        <div className="trip-route-display">
+                                            <div className="route-step">
+                                                <div className="route-icon origin"></div>
+                                                <div className="route-text">
+                                                    <span className="route-label">{t('client_dashboard.origin')}</span>
+                                                    <span className="route-value">{viaje.origen || `${safeFixed(viaje.origen_lat)}, ${safeFixed(viaje.origen_lng)}`}</span>
+                                                </div>
                                             </div>
-                                        )}
+                                            <div className="route-step">
+                                                <div className="route-icon destination"></div>
+                                                <div className="route-text">
+                                                    <span className="route-label">{t('client_dashboard.destination')}</span>
+                                                    <span className="route-value">{viaje.destino || `${safeFixed(viaje.destino_lat)}, ${safeFixed(viaje.destino_lng)}`}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="trip-meta-info">
+                                            <div className="meta-item">
+                                                <User size={14} className="text-secondary" />
+                                                <span className="meta-value">{viaje.cliente?.name || 'Cliente'}</span>
+                                            </div>
+
+                                            {viaje.calificacion ? (
+                                                <div className="meta-item rating-received">
+                                                    <Star size={14} fill="#f59e0b" className="text-accent" />
+                                                    <span className="meta-value font-bold">{viaje.calificacion.puntuacion}</span>
+                                                </div>
+                                            ) : (
+                                                <div className="meta-item no-rating-yet">
+                                                    <Star size={14} className="opacity-30" />
+                                                    <span className="meta-value text-muted">--</span>
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
-                                ) : (
-                                    <div className="no-rating" style={{ padding: '1rem', background: 'var(--border-color)', borderRadius: '0.5rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-                                        {t('driver_dashboard.no_rating')}
-                                    </div>
-                                )}
-                            </Card>
+
+                                    {viaje.calificacion?.comentario && (
+                                        <div className="trip-comment-bubble">
+                                            <div className="comment-quote">"</div>
+                                            <p>{viaje.calificacion.comentario}</p>
+                                        </div>
+                                    )}
+                                </Card>
+                            </div>
                         ))}
                     </div>
                 )}
             </main>
-        </div >
+        </div>
     );
 };
 

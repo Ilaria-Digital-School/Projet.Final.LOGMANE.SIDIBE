@@ -844,3 +844,304 @@
     white-space: nowrap !important;
     border: 0 !important;
 }
+
+/* 
+    Premium Driver History & Activity Journal
+*/
+.driver-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+}
+
+.stat-card-premium {
+    background: white;
+    padding: 1.5rem;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    border-left: 6px solid var(--secondary-color);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-card-premium:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+
+.stat-card-premium.earnings {
+    border-left-color: var(--accent-color);
+}
+
+.stat-card-inner {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+}
+
+.stat-icon-wrapper {
+    width: 50px;
+    height: 50px;
+    background: var(--bg-light);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--secondary-color);
+}
+
+.earnings .stat-icon-wrapper {
+    color: var(--accent-color);
+}
+
+.stat-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-label-modern {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    font-weight: 800;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+}
+
+.stat-value-modern {
+    font-size: 1.75rem;
+    font-weight: 900;
+    color: var(--text-main);
+    line-height: 1;
+    margin-top: 0.25rem;
+}
+
+.stat-subtext {
+    font-size: 0.875rem;
+    font-weight: 600;
+    opacity: 0.5;
+}
+
+.history-section-header {
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.section-title-modern {
+    font-size: 1.25rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--text-main);
+}
+
+/* Activity Timeline */
+.activity-timeline {
+    position: relative;
+    padding-left: 1rem;
+}
+
+.timeline-item-wrapper {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    position: relative;
+}
+
+.timeline-marker {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.marker-dot {
+    width: 14px;
+    height: 14px;
+    background: var(--secondary-color);
+    border-radius: 50%;
+    border: 3px solid white;
+    box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.2);
+    z-index: 2;
+}
+
+.marker-line {
+    width: 2px;
+    flex: 1;
+    background: var(--border-color);
+    margin-top: 4px;
+}
+
+.timeline-item-wrapper:last-child .marker-line {
+    display: none;
+}
+
+.timeline-content-card {
+    flex: 1;
+    background: white;
+    border-radius: var(--radius-lg) !important;
+    padding: 1.25rem !important;
+    border: 1px solid var(--border-color) !important;
+    transition: border-color 0.2s ease;
+}
+
+.timeline-content-card:hover {
+    border-color: var(--secondary-color) !important;
+}
+
+.trip-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.trip-time-box {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-weight: 700;
+    background: var(--bg-light);
+    padding: 0.25rem 0.6rem;
+    border-radius: 2rem;
+}
+
+.trip-route-display {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+    position: relative;
+    padding-left: 1.5rem;
+}
+
+.trip-route-display::before {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 8px;
+    bottom: 8px;
+    width: 2px;
+    background: repeating-linear-gradient(to bottom, var(--border-color) 0, var(--border-color) 4px, transparent 4px, transparent 8px);
+}
+
+.route-step {
+    position: relative;
+}
+
+.route-icon {
+    position: absolute;
+    left: -22px;
+    top: 6px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: white;
+    border: 2px solid var(--border-color);
+}
+
+.route-icon.origin {
+    border-color: var(--secondary-color);
+}
+
+.route-icon.destination {
+    border-color: var(--accent-color);
+}
+
+.route-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.route-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    font-weight: 800;
+    color: var(--text-muted);
+    letter-spacing: 0.02em;
+}
+
+.route-value {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-main);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.trip-meta-info {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    border-top: 1px solid var(--bg-light);
+    padding-top: 1rem;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.meta-value {
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.trip-comment-bubble {
+    margin-top: 1rem;
+    background: #fff9eb;
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    position: relative;
+    border-left: 3px solid #f59e0b;
+}
+
+.comment-quote {
+    position: absolute;
+    top: -5px;
+    right: 10px;
+    font-size: 2rem;
+    opacity: 0.1;
+    font-family: serif;
+}
+
+.trip-comment-bubble p {
+    margin: 0;
+    font-size: 0.85rem;
+    font-style: italic;
+    color: #92400e;
+}
+
+.spinner-modern {
+    width: 30px;
+    height: 30px;
+    border: 3px solid var(--bg-light);
+    border-top-color: var(--secondary-color);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@media (max-width: 640px) {
+    .stat-card-premium {
+        padding: 1rem;
+    }
+
+    .stat-value-modern {
+        font-size: 1.5rem;
+    }
+
+    .timeline-item-wrapper {
+        gap: 0.75rem;
+    }
+
+    .trip-meta-info {
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+}
