@@ -12,11 +12,7 @@ import '../../../css/components.css';
 /**
  * MotoristaProfile Component
  *
- * [ES] Gestión del perfil de conductor.
- *      Permite actualizar datos personales (nombre, email, teléfono) y visualizar la información técnica del vehículo registrado.
- *
- * [FR] Gestion du profil du chauffeur.
- *      Permet de mettre à jour les données personnelles (nom, email, téléphone) et de visualiser les informations techniques du véhicule enregistré.
+ * [ES] Gestión del perfil de conductor. Premium Redesign.
  */
 const MotoristaProfile = () => {
     const { user, logout } = useAuth();
@@ -24,13 +20,18 @@ const MotoristaProfile = () => {
 
     // Local state
     const [formData, setFormData] = useState({ name: '', email: '', telefono: '' });
+    const [stats, setStats] = useState({ rating: 0, viajes: 0 });
     const [motoInfo, setMotoInfo] = useState({});
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [memberSince, setMemberSince] = useState('2024');
 
     const { t } = useTranslation();
 
-    useEffect(() => { fetchProfile(); }, []);
+    useEffect(() => {
+        fetchProfile();
+        fetchStats();
+    }, []);
 
     const fetchProfile = async () => {
         setLoading(true);
@@ -45,10 +46,26 @@ const MotoristaProfile = () => {
             if (userData.motorista_perfil) {
                 setMotoInfo(userData.motorista_perfil);
             }
+            if (userData.created_at) {
+                const year = new Date(userData.created_at).getFullYear();
+                setMemberSince(year);
+            }
         } catch (error) {
             toast.error(t('client_profile.loading_error'));
         } finally {
             setLoading(false);
+        }
+    };
+
+    const fetchStats = async () => {
+        try {
+            const res = await axios.get('/api/motorista/stats');
+            setStats({
+                rating: res.data.rating_promedio || 0,
+                viajes: res.data.viajes_completados || 0
+            });
+        } catch (e) {
+            console.error("Error fetching driver stats", e);
         }
     };
 
@@ -133,13 +150,13 @@ const MotoristaProfile = () => {
                         <div className="driver-main-info">
                             <h2 className="driver-name-display">{formData.name || 'Motorista'}</h2>
                             <div className="driver-meta-badges">
-                                <Badge variant="premium" className="badge--sm">
+                                <Badge variant="premium" className="badge--sm status-pulse-active">
                                     <ShieldCheck size={12} style={{ marginRight: '4px' }} />
                                     {t('driver_dashboard.enabled')}
                                 </Badge>
                                 <div className="member-since">
                                     <Calendar size={12} />
-                                    <span>Member since 2024</span>
+                                    <span>{t('landing.how_title').includes('?') ? 'Miembre' : 'Membre'} depuis {memberSince}</span>
                                 </div>
                             </div>
                         </div>
@@ -150,7 +167,7 @@ const MotoristaProfile = () => {
                             <span className="id-stat-label">{t('driver_dashboard.average_rating')}</span>
                             <div className="id-stat-value">
                                 <Star size={16} fill="#f59e0b" className="text-accent" />
-                                <span>4.8</span>
+                                <span>{stats.rating > 0 ? stats.rating.toFixed(1) : t('driver_dashboard.no_rating')}</span>
                             </div>
                         </div>
                         <div className="id-stat-divider"></div>
@@ -158,7 +175,7 @@ const MotoristaProfile = () => {
                             <span className="id-stat-label">{t('driver_dashboard.completed_trips')}</span>
                             <div className="id-stat-value">
                                 <CheckCircle size={16} className="text-secondary" />
-                                <span>124</span>
+                                <span>{stats.viajes}</span>
                             </div>
                         </div>
                     </div>
@@ -206,34 +223,6 @@ const MotoristaProfile = () => {
                                 />
                             </div>
 
-                            {/* Preferences - Simplified in profile */}
-                            <div className="preferences-mini-card">
-                                <div className="pref-header">
-                                    <Settings size={16} />
-                                    <span>{t('profile.preferences')}</span>
-                                </div>
-                                <Button
-                                    variant="outline"
-                                    type="button"
-                                    className="btn--sm w-full"
-                                    onClick={() => {
-                                        if (!("Notification" in window)) {
-                                            alert(t('profile.browser_no_notifications'));
-                                        } else if (Notification.permission === "granted") {
-                                            new Notification("MotoTX", { body: t('profile.notification_test_body') });
-                                        } else if (Notification.permission !== "denied") {
-                                            Notification.requestPermission().then(permission => {
-                                                if (permission === "granted") {
-                                                    new Notification("MotoTX", { body: t('profile.notification_thanks') });
-                                                }
-                                            });
-                                        }
-                                    }}
-                                >
-                                    {t('profile.test_notification')}
-                                </Button>
-                            </div>
-
                             <Button
                                 type="submit"
                                 disabled={saving}
@@ -242,9 +231,55 @@ const MotoristaProfile = () => {
                                 {saving ? t('common.saving') : t('common.save_changes')}
                             </Button>
                         </form>
+                    </Card>
 
-                        <div className="danger-zone-compact">
-                            <h3 className="danger-title">{t('client_profile.danger_zone')}</h3>
+                    {/* Preferences & Notifications Tester - Separate Card */}
+                    <Card className="profile-preferences-card animate-in fade-in slide-in-from-bottom-6">
+                        <div className="card-header-with-icon">
+                            <Settings size={20} className="text-secondary" />
+                            <h3 className="card-title-section-modern">{t('profile.preferences')}</h3>
+                        </div>
+                        <p className="section-description-text">
+                            {t('driver_dashboard.manage_profile')} - {t('profile.notifications')}
+                        </p>
+
+                        <div className="preferences-action-box">
+                            <div className="pref-info">
+                                <span className="pref-label">{t('profile.test_notification')}</span>
+                                <span className="pref-help">{t('profile.browser_no_notifications')}?</span>
+                            </div>
+                            <Button
+                                variant="outline"
+                                type="button"
+                                className="btn--sm btn--ghost"
+                                onClick={() => {
+                                    if (!("Notification" in window)) {
+                                        alert(t('profile.browser_no_notifications'));
+                                    } else if (Notification.permission === "granted") {
+                                        new Notification("MotoTX", { body: t('profile.notification_test_body') });
+                                    } else if (Notification.permission !== "denied") {
+                                        Notification.requestPermission().then(permission => {
+                                            if (permission === "granted") {
+                                                new Notification("MotoTX", { body: t('profile.notification_thanks') });
+                                            }
+                                        });
+                                    }
+                                }}
+                            >
+                                {t('profile.test_notification')}
+                            </Button>
+                        </div>
+                    </Card>
+
+                    <Card className="profile-danger-card animate-in fade-in slide-in-from-bottom-8">
+                        <div className="danger-zone-enhanced">
+                            <div className="danger-header">
+                                <LogOut size={20} className="text-error" />
+                                <h3 className="danger-title-modern">{t('client_profile.danger_zone')}</h3>
+                            </div>
+                            <p className="danger-description">
+                                {t('client_profile.delete_confirm')}
+                            </p>
                             <Button
                                 onClick={async () => {
                                     const password = window.prompt(t('client_profile.enter_password_confirm'));
@@ -264,9 +299,9 @@ const MotoristaProfile = () => {
                                     }
                                 }}
                                 variant="error"
-                                className="btn--sm w-full btn--ghost"
+                                className="btn--block btn--ghost-error"
                             >
-                                <LogOut size={14} /> {t('client_profile.delete_account')}
+                                <LogOut size={16} /> {t('client_profile.delete_account')}
                             </Button>
                         </div>
                     </Card>

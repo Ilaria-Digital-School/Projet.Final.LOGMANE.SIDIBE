@@ -48,10 +48,11 @@ const MotoristaDashboard = () => {
     const [rating, setRating] = useState(5);
     const [comment, setComment] = useState('');
     const [lastFinishedTripId, setLastFinishedTripId] = useState(null);
-    const [isTogglingStatus, setIsTogglingStatus] = useState(false);
+    // Use a ref for status locking to avoid race conditions with polling
+    const statusLockRef = React.useRef(false);
 
-    const fetchData = async () => {
-        setLoading(true);
+    const fetchData = async (isManual = false) => {
+        if (!isManual) setLoading(true);
         try {
             // Fetch Stats
             try {
@@ -59,12 +60,13 @@ const MotoristaDashboard = () => {
                 setStats(statsRes.data);
             } catch (e) { }
 
-            // Fetch Profile (Wallet Balance)
+            // Fetch Profile (Wallet Balance & Status)
             try {
                 const profileRes = await axios.get('/api/motorista/perfil');
                 setProfile(profileRes.data);
-                // Only update online status if we are NOT currently toggling it manually
-                if (!isTogglingStatus) {
+
+                // Only sync online status IF we aren't currently in the middle of a manual toggle
+                if (!statusLockRef.current) {
                     setIsOnline(profileRes.data.estado_actual === 'activo');
                 }
             } catch (e) { }
@@ -84,7 +86,7 @@ const MotoristaDashboard = () => {
                 setViajes(Array.isArray(pendingRes.data) ? pendingRes.data : []);
             }
         } finally {
-            setLoading(false);
+            if (!isManual) setLoading(false);
         }
     };
 
@@ -142,34 +144,41 @@ const MotoristaDashboard = () => {
         }
     };
 
-    const handleToggleStatus = async () => {
-        if (isTogglingStatus) return; // Prevent multiple clicks
+    const toggleStatus = async () => {
+        if (isTogglingStatus) return; // Prevent double clicks
 
-        const newStatus = !isOnline ? 'activo' : 'inactivo';
+        const newIsOnline = !isOnline;
+        const newStatus = newIsOnline ? 'activo' : 'inactivo';
 
-        // Optimistic UI update
-        setIsOnline(!isOnline);
+        // 1. Optimistic Update & Lock
+        statusLockRef.current = true;
+        setIsOnline(newIsOnline);
         setIsTogglingStatus(true);
 
         try {
-            await axios.put('/api/motorista/status', { estado_actual: newStatus });
-            toast.success(newStatus === 'activo' ? t('driver_dashboard.online_msg') : t('driver_dashboard.offline_msg'));
+            const response = await axios.put('/api/motorista/status', { estado_actual: newStatus });
 
-            // Short delay before allowing background polling to take over again
-            setTimeout(() => {
-                setIsTogglingStatus(false);
-            }, 3000);
+            // 2. Success: Update profile in local state immediately with server data
+            if (response.data && response.data.motorista) {
+                setProfile(prev => ({ ...prev, ...response.data.motorista }));
+            }
+
+            toast.success(newIsOnline ? t('driver_dashboard.online_msg') : t('driver_dashboard.offline_msg'));
         } catch (error) {
-            // Revert on error
-            setIsOnline(isOnline);
-            setIsTogglingStatus(false);
-
+            // 3. Revert on failure
+            setIsOnline(!newIsOnline);
             if (error.response && error.response.status === 403) {
                 toast.error(t('driver_dashboard.subscription_required'));
                 setTimeout(() => navigate('/motorista/suscripciones'), 1500);
-                return;
+            } else {
+                toast.error(t('driver_dashboard.update_error'));
             }
-            toast.error(t('driver_dashboard.update_error') + ': ' + (error.response?.data?.message || 'Check connection'));
+        } finally {
+            // 4. Release lock after a short delay to allow server state to propagate to future polls
+            setTimeout(() => {
+                statusLockRef.current = false;
+                setIsTogglingStatus(false);
+            }, 5000);
         }
     };
 
