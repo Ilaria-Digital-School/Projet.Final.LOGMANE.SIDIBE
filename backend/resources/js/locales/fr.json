@@ -78,8 +78,6 @@
         "edit": "Modifier",
         "refresh": "Actualiser",
         "date_locale": "fr-FR",
-        "name": "Nom",
-        "email": "Email",
         "role": "Rôle",
         "date": "Date",
         "actions": "Actions",
@@ -322,7 +320,43 @@
     },
     "landing": {
         "debug_test": "VERSION FRANÇAISE ACTIVE",
-        "hero_title": "MotoTX: Le Service de Mototaxi Leader et Sûr à Bamako",
+        "hero_title": "Votre trajet sûr et rapide à Bamako",
+        "hero_subtitle_modern": "Oubliez le trafic et les attentes. Avec MotoTX, vous arrivez à destination de manière ponctuelle, économique et avec les plus hauts standards de sécurité à chaque trajet.",
+        "btn_request_trip": "Commander un trajet",
+        "btn_want_to_drive": "Je veux conduire",
+        "hero_trust": "Plus de <span class='font-bold text-gray-900'>+500 voyageurs</span> nous font confiance quotidiennement",
+        "benefits": {
+            "title1": "La sécurité d'abord",
+            "desc1": "Tous nos chauffeurs sont vérifiés et disposent d'un équipement de sécurité complet pour vous protéger.",
+            "title2": "Prix fixe",
+            "desc2": "Connaissez le coût de votre trajet avant de monter. Pas de surprises ni de marchandage inutile.",
+            "title3": "Rapidité",
+            "desc3": "Nos motos circulent agilement dans le trafic de Bamako pour que vous arriviez toujours à l'heure."
+        },
+        "how_it_works": {
+            "title": "Comment ça marche",
+            "subtitle": "Voyager avec nous est aussi simple que ces trois étapes",
+            "step1_title": "Indiquez votre destination",
+            "step1_desc": "Sélectionnez où vous voulez aller depuis notre plateforme facile à utiliser.",
+            "step2_title": "Chauffeur assigné",
+            "step2_desc": "Nous vous connectons avec le chauffeur le plus proche et vérifié en quelques secondes.",
+            "step3_title": "Profitez du voyage",
+            "step3_desc": "Montez sur la moto et voyagez tranquillement jusqu'à votre point de destination."
+        },
+        "roadmap": {
+            "title": "Bientôt disponible",
+            "subtitle": "Nous élargissons nos services pour couvrir tous vos besoins.",
+            "delivery_title": "MotoTX Livraisons",
+            "delivery_desc": "Envoi de colis et messagerie rapide dans toute la ville.",
+            "business_title": "MotoTX Entreprises",
+            "business_desc": "Solutions logistiques pour votre entreprise et livraisons e-commerce.",
+            "status": "Arrive bientôt"
+        },
+        "driver_cta": {
+            "title": "Conduisez avec MotoTX et augmentez vos revenus",
+            "subtitle": "Rejoignez la plus grande flotte de chauffeurs de Bamako. Vous fournissez la moto, nous fournissons les clients.",
+            "btn": "Enregistrer ma moto"
+        },
         "hero_subtitle": "La plateforme intelligente qui connecte des milliers de Maliens à des conducteurs vérifiés. Rapide, économique et soutenu par Orange Money.",
         "get_started": "Commencer Maintenant →",
         "view_plans": "Voir les Forfaits",
@@ -368,7 +402,70 @@
         "premium_service": "Service Premium",
         "terms_conditions": "Termes et Conditions",
         "faq_title_short": "FAQ",
-        "cgu": "CGU"
+        "cgu": "CGU",
+        "stats": {
+            "trips": "Trajets Complétés",
+            "drivers": "Chauffeurs Actifs",
+            "rating": "Note Moyenne",
+            "safety": "Sécurité Garantie"
+        },
+        "safety_protocol": {
+            "badge": "Sécurité Extrême",
+            "title": "Voyager avec MotoTX est plus sûr que toute autre option",
+            "item1_title": "Chauffeurs Certifiés",
+            "item1_desc": "Chaque chauffeur passe par un processus rigoureux de validation en personne, de vérification des antécédents et de l'état du véhicule.",
+            "item2_title": "Surveillance 24/7",
+            "item2_desc": "Notre équipe centrale surveille chaque trajet en temps réel pour garantir que vous arriviez à destination sans incident.",
+            "item3_title": "Partagez votre Trajet",
+            "item3_desc": "Envoyez un lien de suivi à votre famille ou à vos amis afin qu'ils sachent votre position exacte à tout moment.",
+            "item4_title": "Bouton d'Urgence",
+            "item4_desc": "Intégré dans l'application pour un contact immédiat avec le support et les services d'urgence en cas de besoin."
+        },
+        "forfaits_modern": {
+            "title": "Des plans adaptés à vos besoins",
+            "subtitle": "Économisez jusqu'à 25% sur vos trajets quotidiens en activant l'un de nos packs prépayés.",
+            "tag_popular": "LE PLUS CHOISI",
+            "feature_trips": "<strong>{{count}}</strong> Trajets inclus",
+            "feature_days": "Valable pendant <strong>{{count}}</strong> jours",
+            "feature_priority": "Priorité d'assignation",
+            "btn_activate": "Activer le Plan",
+            "plan_basic": "Basique",
+            "plan_premium": "Premium",
+            "plan_business": "Entreprise"
+        },
+        "testimonials": {
+            "title": "Ce qu'ils disent de nous",
+            "role_user": "Utilisateur Régulier",
+            "role_student": "Étudiante",
+            "role_driver": "Chauffeur MotoTX"
+        },
+        "faq_section": {
+            "title": "Questions Fréquentes",
+            "subtitle": "Tout ce que vous devez savoir sur MotoTX",
+            "q1": "Comment puis-je commander un trajet ?",
+            "a1": "C'est très simple. Connectez-vous à votre compte, sélectionnez votre destination sur la carte et cliquez sur 'Commander'. En quelques secondes, nous vous assignerons le chauffeur le plus proche.",
+            "q2": "Quels modes de paiement acceptez-vous ?",
+            "a2": "Nous acceptons actuellement les paiements en espèces à la fin du trajet. Vous pouvez également acheter des 'Forfaits' (packs de trajets) via Orange Money ou Moov Money pour voyager sans vous soucier de la monnaie.",
+            "q3": "Les trajets sont-ils sûrs ?",
+            "a3": "Absolument. Tous nos chauffeurs disposent d'un casque certifié pour le passager, d'une assurance voyage et sont suivis par GPS pendant tout le trajet.",
+            "q4": "Puis-je annuler un trajet commandé ?",
+            "a4": "Oui, vous pouvez annuler le trajet sans frais avant que le chauffeur n'arrive à votre point de départ."
+        },
+        "contact_modern": {
+            "title": "On discute ?<br/>Votre avis compte",
+            "desc": "Nous sommes là pour vous aider. Si vous avez des questions professionnelles ou si vous souhaitez rejoindre notre flotte, écrivez-nous.",
+            "label_name": "Nom Complet",
+            "label_email": "Email",
+            "label_subject": "Sujet",
+            "label_message": "Message",
+            "placeholder_name": "Ex: Amadou Koné",
+            "placeholder_message": "Comment pouvons-nous vous aider ?",
+            "subject_support": "Support Utilisateur",
+            "subject_driver": "Inscription Chauffeur",
+            "subject_business": "MotoTX Entreprises",
+            "subject_other": "Autres",
+            "btn_send": "Envoyer le Message"
+        }
     },
     "plans": {
         "Diario": "Journalier",

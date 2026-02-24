@@ -97,13 +97,13 @@ const LandingPage = () => {
                         </div>
 
                         <div className="flex gap-8 text-sm font-medium text-gray-500">
-                            <a href="/privacy" className="hover:text-blue-600 transition-colors uppercase tracking-widest text-[10px]">Privacidad</a>
-                            <a href="/terms" className="hover:text-blue-600 transition-colors uppercase tracking-widest text-[10px]">Términos</a>
-                            <a href="/contact" className="hover:text-blue-600 transition-colors uppercase tracking-widest text-[10px]">Soporte</a>
+                            <a href="/privacy" className="hover:text-blue-600 transition-colors uppercase tracking-widest text-[10px]">{t('landing.privacy_policy')}</a>
+                            <a href="/terms" className="hover:text-blue-600 transition-colors uppercase tracking-widest text-[10px]">{t('landing.terms_conditions')}</a>
+                            <a href="#contacto" className="hover:text-blue-600 transition-colors uppercase tracking-widest text-[10px]">{t('landing.contact_modern.subject_support')}</a>
                         </div>
 
                         <p className="text-gray-400 text-xs">
-                            © {new Date().getFullYear()} MotoTX. Todos los derechos reservados.
+                            © {new Date().getFullYear()} MotoTX. {t('common.rights_reserved') || "Todos los derechos reservados."}
                         </p>
                     </div>
                 </div>

@@ -1,7 +1,43 @@
 {
     "landing": {
         "debug_test": "ENGLISH VERSION ACTIVE",
-        "hero_title": "MotoTX: The Leading and Safe Motorcycle Taxi Service in Bamako",
+        "hero_title": "Your safe and fast ride in Bamako",
+        "hero_subtitle_modern": "Forget about traffic and waiting. With MotoTX, you arrive at your destination punctually, economically and with the highest safety standards on every trip.",
+        "btn_request_trip": "Request a ride",
+        "btn_want_to_drive": "I want to drive",
+        "hero_trust": "More than <span class='font-bold text-gray-900'>+500 travelers</span> trust us daily",
+        "benefits": {
+            "title1": "Safety first",
+            "desc1": "All our drivers are verified and have full safety equipment to protect you.",
+            "title2": "Fixed price",
+            "desc2": "Know the cost of your trip before getting on. No surprises or unnecessary haggling.",
+            "title3": "Speed",
+            "desc3": "Our bikes move nimbly through Bamako's traffic so you always arrive on time."
+        },
+        "how_it_works": {
+            "title": "How it works",
+            "subtitle": "Traveling with us is as simple as these three steps",
+            "step1_title": "Enter destination",
+            "step1_desc": "Select where you want to go from our easy-to-use platform.",
+            "step2_title": "Driver assigned",
+            "step2_desc": "We connect you with the nearest verified driver in seconds.",
+            "step3_title": "Enjoy the ride",
+            "step3_desc": "Get on the bike and travel peacefully to your destination point."
+        },
+        "roadmap": {
+            "title": "Coming Soon",
+            "subtitle": "We are expanding our services to cover all your needs.",
+            "delivery_title": "MotoTX Deliveries",
+            "delivery_desc": "Package shipping and fast messaging throughout the city.",
+            "business_title": "MotoTX Business",
+            "business_desc": "Logistics solutions for your business and e-commerce deliveries.",
+            "status": "Coming Soon"
+        },
+        "driver_cta": {
+            "title": "Drive with MotoTX and increase your income",
+            "subtitle": "Join Bamako's largest driver fleet. You provide the bike, we provide the clients.",
+            "btn": "Register my bike"
+        },
         "hero_subtitle": "The smart platform connecting thousands of Malians with verified drivers. Fast, affordable, and backed by Orange Money.",
         "get_started": "Get Started Now →",
         "view_plans": "View Plans",
@@ -47,7 +83,70 @@
         "premium_service": "Premium Service",
         "terms_conditions": "Terms and Conditions",
         "faq_title_short": "FAQ",
-        "cgu": "Terms of Use"
+        "cgu": "Terms of Use",
+        "stats": {
+            "trips": "Completed Trips",
+            "drivers": "Active Drivers",
+            "rating": "Average Rating",
+            "safety": "Guaranteed Safety"
+        },
+        "safety_protocol": {
+            "badge": "Extreme Safety",
+            "title": "Traveling with MotoTX is safer than any other option",
+            "item1_title": "Certified Drivers",
+            "item1_desc": "Each driver undergoes a rigorous in-person validation process, background checks, and vehicle condition inspection.",
+            "item2_title": "24/7 Monitoring",
+            "item2_desc": "Our central team monitors every journey in real-time to ensure you reach your destination without incident.",
+            "item3_title": "Share Your Ride",
+            "item3_desc": "Send a tracking link to your family or friends so they know your exact location at all times.",
+            "item4_title": "Emergency Button",
+            "item4_desc": "Integrated into the app for immediate contact with support and emergency services if needed."
+        },
+        "forfaits_modern": {
+            "title": "Plans that fit your needs",
+            "subtitle": "Save up to 25% on your daily commutes by activating one of our prepaid packs.",
+            "tag_popular": "MOST POPULAR",
+            "feature_trips": "<strong>{{count}}</strong> Trips included",
+            "feature_days": "Valid for <strong>{{count}}</strong> days",
+            "feature_priority": "Assignment priority",
+            "btn_activate": "Activate Plan",
+            "plan_basic": "Basic",
+            "plan_premium": "Premium",
+            "plan_business": "Business"
+        },
+        "testimonials": {
+            "title": "What they say about us",
+            "role_user": "Regular User",
+            "role_student": "Student",
+            "role_driver": "MotoTX Driver"
+        },
+        "faq_section": {
+            "title": "Frequently Asked Questions",
+            "subtitle": "Everything you need to know about MotoTX",
+            "q1": "How do I request a ride?",
+            "a1": "It's very easy. Log in to your account, select your destination on the map, and click 'Request'. In a few seconds, we will assign you the nearest driver.",
+            "q2": "What payment methods do you accept?",
+            "a2": "We currently accept cash payments at the end of the trip. You can also buy 'Forfaits' (trip packs) via Orange Money or Moov Money to travel without worrying about change.",
+            "q3": "Are the rides safe?",
+            "a3": "Absolutely. All our drivers have a certified helmet for the passenger, travel insurance, and are tracked via GPS throughout the journey.",
+            "q4": "Can I cancel a requested ride?",
+            "a4": "Yes, you can cancel the ride at no cost before the driver arrives at your pickup location."
+        },
+        "contact_modern": {
+            "title": "Shall we talk?<br/>Your opinion matters",
+            "desc": "We are here to help. If you have corporate questions or want to join our fleet, write to us.",
+            "label_name": "Full Name",
+            "label_email": "Email",
+            "label_subject": "Subject",
+            "label_message": "Message",
+            "placeholder_name": "Ex: Amadou Koné",
+            "placeholder_message": "How can we help you?",
+            "subject_support": "User Support",
+            "subject_driver": "Driver Registration",
+            "subject_business": "MotoTX Business",
+            "subject_other": "Others",
+            "btn_send": "Send Message"
+        }
     },
     "driver_dashboard": {
         "new_trip_alert": "New trip available!",
@@ -130,7 +229,8 @@
         "error": "Error",
         "edit": "Edit",
         "refresh": "Refresh",
-        "date_locale": "en-US"
+        "date_locale": "en-US",
+        "rights_reserved": "All rights reserved."
     },
     "auth": {
         "welcome_title": "Welcome to MotoTX",

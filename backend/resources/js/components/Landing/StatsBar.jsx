@@ -1,12 +1,14 @@
 import React from 'react';
 import { Route, Users, Star, Award } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const StatsBar = () => {
+    const { t } = useTranslation();
     const stats = [
-        { icon: <Route className="w-6 h-6" />, value: "+25,000", label: "Viajes Completados" },
-        { icon: <Users className="w-6 h-6" />, value: "+1,200", label: "Motoristas Activos" },
-        { icon: <Star className="w-6 h-6" />, value: "4.9/5", label: "Valoración Media" },
-        { icon: <Award className="w-6 h-6" />, value: "100%", label: "Seguridad Garantizada" },
+        { icon: <Route className="w-6 h-6" />, value: "+25,000", label: t('landing.stats.trips') },
+        { icon: <Users className="w-6 h-6" />, value: "+1,200", label: t('landing.stats.drivers') },
+        { icon: <Star className="w-6 h-6" />, value: "4.9/5", label: t('landing.stats.rating') },
+        { icon: <Award className="w-6 h-6" />, value: "100%", label: t('landing.stats.safety') },
     ];
 
     return (

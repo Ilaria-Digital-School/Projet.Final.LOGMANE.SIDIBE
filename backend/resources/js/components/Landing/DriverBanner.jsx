@@ -1,52 +1,39 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { BadgeCheck } from 'lucide-react';
+import { UserPlus } from 'lucide-react';
 
 const DriverBanner = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
 
     return (
-        <section className="py-20 bg-blue-600 rounded-y-[4rem] overflow-hidden relative">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-blue-400/20 via-transparent to-transparent"></div>
+        <section className="py-20">
+            <div className="container mx-auto px-6">
+                <div className="relative rounded-[3rem] bg-gradient-to-br from-gray-900 via-blue-950 to-gray-900 p-12 lg:p-20 overflow-hidden shadow-2xl">
+                    {/* Decorative elements */}
+                    <div className="absolute top-0 right-0 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl -mr-48 -mt-48"></div>
+                    <div className="absolute bottom-0 left-0 w-96 h-96 bg-emerald-600/10 rounded-full blur-3xl -ml-48 -mb-48"></div>
 
-            <div className="container mx-auto px-6 relative z-10">
-                <div className="max-w-4xl mx-auto text-center">
-                    <h2 className="text-3xl md:text-5xl font-extrabold text-white mb-8 leading-tight">
-                        Conduce con MotoTX y aumenta tus ingresos
-                    </h2>
-                    <p className="text-blue-100 text-xl mb-12 max-w-2xl mx-auto font-medium">
-                        Únete a la flota de motoristas más grande y tecnológica de Bamako. Flexibilidad total y pagos asegurados.
-                    </p>
-
-                    <div className="flex flex-col sm:flex-row justify-center items-center gap-8 mb-12 text-white/90">
-                        <div className="flex items-center gap-2">
-                            <BadgeCheck className="h-6 w-6 text-emerald-300" />
-                            <span className="font-semibold text-lg">Pagos semanales</span>
+                    <div className="relative z-10 lg:flex lg:items-center lg:justify-between text-center lg:text-left gap-12">
+                        <div className="lg:w-2/3">
+                            <h2 className="text-4xl lg:text-5xl font-black text-white mb-8 leading-tight">
+                                {t('landing.driver_cta.title')}
+                            </h2>
+                            <p className="text-xl text-blue-100 opacity-90 leading-relaxed">
+                                {t('landing.driver_cta.subtitle')}
+                            </p>
                         </div>
-                        <div className="hidden sm:block h-2 w-2 rounded-full bg-blue-400 opacity-50"></div>
-                        <div className="flex items-center gap-2">
-                            <BadgeCheck className="h-6 w-6 text-emerald-300" />
-                            <span className="font-semibold text-lg">Tú eliges el horario</span>
-                        </div>
-                        <div className="hidden sm:block h-2 w-2 rounded-full bg-blue-400 opacity-50"></div>
-                        <div className="flex items-center gap-2">
-                            <BadgeCheck className="h-6 w-6 text-emerald-300" />
-                            <span className="font-semibold text-lg">App de última generación</span>
+                        <div className="mt-12 lg:mt-0">
+                            <button
+                                onClick={() => navigate('/register')}
+                                className="inline-flex items-center gap-3 bg-emerald-500 hover:bg-emerald-600 text-white px-10 py-5 rounded-2xl font-black text-xl shadow-xl shadow-emerald-900/40 transition-all hover:scale-105 active:scale-95 group"
+                            >
+                                <UserPlus className="w-6 h-6 group-hover:rotate-12 transition-transform" />
+                                {t('landing.driver_cta.btn')}
+                            </button>
                         </div>
                     </div>
-
-                    <button
-                        onClick={() => navigate('/register')}
-                        className="bg-white text-blue-600 hover:bg-gray-100 px-12 py-5 rounded-2xl text-xl font-black shadow-2xl transition-all hover:scale-105 active:scale-95"
-                    >
-                        Registrar mi moto
-                    </button>
-
-                    <p className="mt-8 text-blue-200 text-sm font-medium">
-                        Requisito: Licencia de conducir vigente y moto en buen estado.
-                    </p>
                 </div>
             </div>
         </section>

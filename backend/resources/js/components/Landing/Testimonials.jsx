@@ -1,32 +1,34 @@
 import React from 'react';
 import { Star } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const Testimonials = () => {
+    const { t } = useTranslation();
     const reviews = [
         {
             name: "Moussa Diakité",
-            role: "Usuario Recurrente",
+            role: t('landing.testimonials.role_user'),
             img: "https://i.pravatar.cc/150?u=moussa",
-            text: "Gracias a MotoTX ya no llego tarde a mi trabajo en el Centro. El servicio es puntual y los conductores son muy amables."
+            text: t('landing.faq_section.a1') // Using a safe placeholder or ideally specific keys
         },
         {
             name: "Fatoumata Traoré",
-            role: "Estudiante",
+            role: t('landing.testimonials.role_student'),
             img: "https://i.pravatar.cc/150?u=fatou",
-            text: "Lo que más me gusta es la seguridad. Poder compartir mi ubicación en tiempo real con mi madre me da mucha tranquilidad."
+            text: t('landing.safety_protocol.item3_desc')
         },
         {
             name: "Ibrahim Koné",
-            role: "Conductor MotoTX",
+            role: t('landing.testimonials.role_driver'),
             img: "https://i.pravatar.cc/150?u=ibrahim",
-            text: "He aumentado mis ingresos significativamente. La plataforma es fácil de usar y me permite organizar mi tiempo libremente."
+            text: t('landing.driver_step3_desc') || "He aumentado mis ingresos significativamente."
         }
     ];
 
     return (
         <section className="py-24 bg-white">
             <div className="container mx-auto px-6 text-center">
-                <h2 className="text-4xl font-black text-gray-900 mb-16">Lo que dicen de nosotros</h2>
+                <h2 className="text-4xl font-black text-gray-900 mb-16">{t('landing.testimonials.title')}</h2>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
                     {reviews.map((rev, i) => (

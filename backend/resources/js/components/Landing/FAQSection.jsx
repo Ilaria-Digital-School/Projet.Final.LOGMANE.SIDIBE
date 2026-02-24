@@ -1,25 +1,27 @@
 import React, { useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const FAQSection = () => {
+    const { t } = useTranslation();
     const [openIndex, setOpenIndex] = useState(0);
 
     const questions = [
         {
-            q: "¿Cómo pido un viaje?",
-            a: "Es muy fácil. Inicia sesión en tu cuenta, selecciona tu destino en el mapa y haz clic en 'Solicitar'. En pocos segundos te asignaremos el conductor más cercano."
+            q: t('landing.faq_section.q1'),
+            a: t('landing.faq_section.a1')
         },
         {
-            q: "¿Qué métodos de pago aceptan?",
-            a: "Actualmente aceptamos pago en efectivo al finalizar el viaje. También puedes comprar 'Forfaits' (paquetes de viajes) mediante transferencia Orange Money o Moov Money para viajar sin preocuparte por el suelto."
+            q: t('landing.faq_section.q2'),
+            a: t('landing.faq_section.a2')
         },
         {
-            q: "¿Son seguros los trayectos?",
-            a: "Absolutamente. Todos nuestros conductores cuentan con casco certificado para el pasajero, seguro de viaje y son rastreados vía GPS durante todo el recorrido."
+            q: t('landing.faq_section.q3'),
+            a: t('landing.faq_section.a3')
         },
         {
-            q: "¿Puedo cancelar un viaje solicitado?",
-            a: "Sí, puedes cancelar el viaje sin coste alguno antes de que el conductor llegue a tu ubicación de origen."
+            q: t('landing.faq_section.q4'),
+            a: t('landing.faq_section.a4')
         }
     ];
 
@@ -27,8 +29,8 @@ const FAQSection = () => {
         <section className="py-24 bg-gray-50">
             <div className="container mx-auto px-6 max-w-3xl">
                 <div className="text-center mb-16">
-                    <h2 className="text-4xl font-black text-gray-900">Preguntas Frecuentes</h2>
-                    <p className="text-gray-600 mt-4 font-medium italic">Todo lo que necesitas saber sobre MotoTX</p>
+                    <h2 className="text-4xl font-black text-gray-900">{t('landing.faq_section.title')}</h2>
+                    <p className="text-gray-600 mt-4 font-medium italic">{t('landing.faq_section.subtitle')}</p>
                 </div>
 
                 <div className="space-y-4">
