@@ -229,6 +229,8 @@
         "logout": "Logout",
         "register": "Register",
         "email": "Email",
+        "name": "Name",
+        "phone": "Phone",
         "password": "Password",
         "submit": "Submit",
         "back_home": "← Back to Home",

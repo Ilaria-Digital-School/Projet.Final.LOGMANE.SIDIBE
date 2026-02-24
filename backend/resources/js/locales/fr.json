@@ -78,6 +78,8 @@
         "logout": "Déconnexion",
         "register": "S'inscrire",
         "email": "Email",
+        "name": "Nom",
+        "phone": "Téléphone",
         "password": "Mot de passe",
         "submit": "Envoyer",
         "back_home": "← Retour à l'accueil",
