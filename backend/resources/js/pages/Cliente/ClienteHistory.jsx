@@ -11,33 +11,60 @@ import '../../../css/components.css';
 /**
  * ClienteHistory Component
  *
- * [ES] Historial de trayectos del cliente.
- *      Muestra todos los viajes realizados, su estado, tarifa y permite calificar aquellos que aún no tengan puntuación.
- *
- * [FR] Historique des trajets du client.
- *      Affiche tous les voyages effectués, leur statut, leur tarif et permet de noter ceux qui n'ont pas encore de note.
+ * [ES] Historial de trayectos del cliente — diseño premium con línea de tiempo.
+ * [FR] Historique des trajets client — design premium avec chronologie.
  */
 
-// [PHASE 2] Helper for safe numeric display
 const safeFixed = (val, digits = 4) => {
     const parsed = parseFloat(val);
     if (isNaN(parsed)) return '0.0000';
     return parsed.toFixed(digits);
 };
 
+const StatusBadge = ({ estado }) => {
+    const map = {
+        completado: { label: '✓ Completado', bg: '#dcfce7', color: '#166534' },
+        cancelado: { label: '✕ Cancelado', bg: '#fee2e2', color: '#991b1b' },
+        en_curso: { label: '▶ En Curso', bg: '#dbeafe', color: '#1d4ed8' },
+        aceptado: { label: '◉ Aceptado', bg: '#fef3c7', color: '#92400e' },
+        solicitado: { label: '⏳ Solicitado', bg: '#f3f4f6', color: '#374151' },
+    };
+    const s = map[estado] || { label: estado, bg: '#f3f4f6', color: '#374151' };
+    return (
+        <span style={{
+            display: 'inline-block',
+            padding: '0.2rem 0.65rem',
+            borderRadius: '9999px',
+            fontSize: '0.72rem',
+            fontWeight: '700',
+            backgroundColor: s.bg,
+            color: s.color,
+            whiteSpace: 'nowrap'
+        }}>
+            {s.label}
+        </span>
+    );
+};
+
+const StarRow = ({ rating }) => (
+    <div style={{ display: 'flex', gap: '2px' }}>
+        {[1, 2, 3, 4, 5].map(s => (
+            <span key={s} style={{ fontSize: '1rem', color: s <= rating ? '#f59e0b' : '#d1d5db' }}>★</span>
+        ))}
+    </div>
+);
+
 const ClienteHistory = () => {
     const { logout, user } = useAuth();
     const navigate = useNavigate();
+    const { t } = useTranslation();
+
     const [viajes, setViajes] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedTrip, setSelectedTrip] = useState(null);
     const [showRatingModal, setShowRatingModal] = useState(false);
 
-    const { t } = useTranslation();
-
-    useEffect(() => {
-        fetchHistory();
-    }, []);
+    useEffect(() => { fetchHistory(); }, []);
 
     const fetchHistory = async () => {
         setLoading(true);
@@ -50,47 +77,32 @@ const ClienteHistory = () => {
         }
     };
 
-    const handleLogout = () => {
-        logout();
-        navigate('/login');
-    };
+    const handleLogout = () => { logout(); navigate('/login'); };
 
-    const openRatingModal = (trip) => {
-        setSelectedTrip(trip);
-        setShowRatingModal(true);
-    };
-
-    const renderStars = (rating) => {
-        return (
-            <div className="stars-container">
-                {[1, 2, 3, 4, 5].map((star) => (
-                    <span key={star} className={`star ${star <= rating ? 'filled' : 'empty'}`}>
-                        ★
-                    </span>
-                ))}
-            </div>
-        );
-    };
+    const completedTrips = viajes.filter(v => v.estado === 'completado').length;
+    const ratedTrips = viajes.filter(v => v.calificacion).length;
 
     return (
         <div className="dashboard-container">
             <SEO title={t('client_dashboard.history')} />
 
+            {/* ─── Header ─── */}
             <header className="mtx-header">
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <span style={{ fontSize: '2rem' }}>🏍️</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <div style={{
+                        background: 'var(--secondary-color)',
+                        width: '2.5rem', height: '2.5rem',
+                        borderRadius: '50%',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: '1.1rem', flexShrink: 0
+                    }}>📋</div>
                     <div>
-                        <h1 className="header-title" style={{ fontSize: '1.5rem', fontWeight: 'bold', color: 'var(--primary-color)', margin: 0 }}>
-                            {t('client_dashboard.history')}
-                        </h1>
-                        <span style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>
-                            {user?.name || t('common.client')}
-                        </span>
+                        <h1 className="header-title">{t('client_dashboard.history')}</h1>
+                        <span className="header-subtitle">{user?.name || t('auth.role_client')}</span>
                     </div>
                 </div>
-
-                <div className="desktop-nav" style={{ display: 'flex', gap: '1rem' }}>
-                    <Button onClick={() => navigate('/cliente')} label="Dashboard">
+                <div className="desktop-nav">
+                    <Button variant="outline" onClick={() => navigate('/cliente')} label="Dashboard">
                         ← Dashboard
                     </Button>
                     <Button variant="outline" onClick={() => navigate('/cliente/perfil')} label={t('client_dashboard.profile')}>
@@ -102,9 +114,9 @@ const ClienteHistory = () => {
                 </div>
             </header>
 
-            {/* Mobile Bottom Nav */}
+            {/* ─── Mobile Bottom Nav ─── */}
             <nav className="mobile-bottom-nav">
-                <Button variant="ghost" onClick={() => navigate('/cliente')} label="Dashboard">
+                <Button variant="ghost" onClick={() => navigate('/cliente')} label={t('nav.dashboard')}>
                     <span style={{ fontSize: '1.25rem' }}>🏠</span>
                     {t('nav.dashboard')}
                 </Button>
@@ -116,85 +128,155 @@ const ClienteHistory = () => {
                     <span style={{ fontSize: '1.25rem' }}>👤</span>
                     {t('client_dashboard.profile')}
                 </Button>
+                <Button variant="ghost" onClick={handleLogout} label={t('common.logout')} className="text-error">
+                    <span style={{ fontSize: '1.25rem' }}>🚪</span>
+                    {t('common.logout')}
+                </Button>
             </nav>
 
-            <main className="main-content-centered">
-                {loading ? (
-                    <div className="loading-state">
-                        {t('common.loading')}
+            {/* ─── Main Content ─── */}
+            <main className="main-content-centered" style={{ paddingTop: '1.5rem' }}>
+
+                {/* Stats Summary Bar */}
+                {!loading && viajes.length > 0 && (
+                    <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(3, 1fr)',
+                        gap: '1rem',
+                        marginBottom: '1.5rem'
+                    }}>
+                        {[
+                            { icon: '🛵', label: t('client_dashboard.total_trips') || 'Total viajes', value: viajes.length },
+                            { icon: '✅', label: t('client_dashboard.completed') || 'Completados', value: completedTrips },
+                            { icon: '⭐', label: t('client_dashboard.rated') || 'Calificados', value: ratedTrips },
+                        ].map((stat, i) => (
+                            <div key={i} style={{
+                                background: 'white',
+                                borderRadius: '1rem',
+                                padding: '1rem',
+                                textAlign: 'center',
+                                boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+                                border: '1px solid var(--border-color)'
+                            }}>
+                                <div style={{ fontSize: '1.5rem', marginBottom: '0.25rem' }}>{stat.icon}</div>
+                                <div style={{ fontSize: '1.5rem', fontWeight: '900', color: 'var(--primary-color)', lineHeight: 1 }}>{stat.value}</div>
+                                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>{stat.label}</div>
+                            </div>
+                        ))}
                     </div>
+                )}
+
+                {/* Content */}
+                {loading ? (
+                    <Card>
+                        <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>
+                            <div style={{
+                                width: '3rem', height: '3rem',
+                                border: '4px solid #e2e8f0',
+                                borderTopColor: 'var(--primary-color)',
+                                borderRadius: '50%',
+                                animation: 'spin 1s linear infinite',
+                                margin: '0 auto 1rem'
+                            }} />
+                            {t('common.loading')}
+                        </div>
+                    </Card>
                 ) : viajes.length === 0 ? (
-                    <Card className="empty-state">
-                        <div className="empty-icon">📋</div>
-                        <p className="empty-text">
-                            {t('client_dashboard.no_trips')}
-                        </p>
-                        <Button
-                            onClick={() => navigate('/cliente')}
-                            className="mt-6"
-                        >
-                            {t('client_dashboard.request_trip')}
-                        </Button>
+                    <Card>
+                        <div style={{ textAlign: 'center', padding: '3rem' }}>
+                            <div style={{ fontSize: '3.5rem', marginBottom: '1rem' }}>📭</div>
+                            <h3 style={{ marginBottom: '0.5rem', color: 'var(--text-main)', fontWeight: '700' }}>
+                                {t('client_dashboard.no_trips')}
+                            </h3>
+                            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
+                                {t('client_dashboard.no_trips_desc') || 'Aún no has realizado ningún viaje.'}
+                            </p>
+                            <Button onClick={() => navigate('/cliente')} variant="primary">
+                                🛵 {t('client_dashboard.request_trip')}
+                            </Button>
+                        </div>
                     </Card>
                 ) : (
-                    <div className="history-grid" style={{ display: 'grid', gap: '1.5rem' }}>
-                        {Array.isArray(viajes) && viajes.map((viaje) => (
-                            <Card key={viaje.id} className="history-item">
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '1.5rem' }}>
+                    <div style={{ display: 'grid', gap: '1rem' }}>
+                        {Array.isArray(viajes) && viajes.map((viaje, index) => (
+                            <Card key={viaje.id} className="history-item" style={{ padding: '1.25rem' }}>
+                                {/* Trip Header */}
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem', gap: '0.5rem' }}>
                                     <div>
-                                        <div className="history-date" style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
-                                            {new Date(viaje.updated_at).toLocaleDateString(t('common.date_locale', 'es-ES'), {
-                                                year: 'numeric',
-                                                month: 'long',
-                                                day: 'numeric',
-                                                hour: '2-digit',
-                                                minute: '2-digit'
+                                        <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.2rem' }}>
+                                            {new Date(viaje.updated_at).toLocaleDateString(t('common.date_locale') || 'es-ES', {
+                                                year: 'numeric', month: 'short', day: 'numeric',
+                                                hour: '2-digit', minute: '2-digit'
                                             })}
                                         </div>
-                                        <div className="history-driver" style={{ fontSize: '1.25rem', fontWeight: 'bold', color: 'var(--text-main)' }}>
-                                            {t('client_dashboard.driver')}: {viaje.motorista?.name || 'N/A'}
+                                        <div style={{ fontWeight: '700', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                                            🏍️ {viaje.motorista?.name || 'N/A'}
                                         </div>
                                     </div>
-                                    <Badge variant="secondary">{t('status.completado')}</Badge>
+                                    <StatusBadge estado={viaje.estado} />
                                 </div>
 
-                                <div className="trip-details-grid" style={{ background: 'var(--bg-light)', padding: '1rem', borderRadius: '0.5rem', marginBottom: '1.5rem' }}>
-                                    <div className="detail-item">
-                                        <div className="detail-label">{t('client_dashboard.origin')}</div>
-                                        <div className="detail-value" style={{ fontSize: '0.9rem' }}>
+                                {/* Route timeline */}
+                                <div style={{
+                                    background: 'var(--bg-light)',
+                                    borderRadius: '0.75rem',
+                                    padding: '0.875rem 1rem',
+                                    marginBottom: '1rem',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: '0.5rem'
+                                }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                        <span style={{
+                                            width: '0.6rem', height: '0.6rem', borderRadius: '50%',
+                                            background: 'var(--primary-color)', flexShrink: 0
+                                        }} />
+                                        <span style={{ fontSize: '0.82rem', color: 'var(--text-main)', flex: 1 }}>
                                             {viaje.origen || `${safeFixed(viaje.origen_lat)}, ${safeFixed(viaje.origen_lng)}`}
-                                        </div>
+                                        </span>
                                     </div>
-                                    <div className="detail-item">
-                                        <div className="detail-label">{t('client_dashboard.destination')}</div>
-                                        <div className="detail-value" style={{ fontSize: '0.9rem' }}>
+                                    <div style={{ marginLeft: '0.27rem', width: '1px', height: '1rem', background: 'var(--border-color)' }} />
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                        <span style={{
+                                            width: '0.6rem', height: '0.6rem', borderRadius: '2px',
+                                            background: 'var(--accent-color)', flexShrink: 0
+                                        }} />
+                                        <span style={{ fontSize: '0.82rem', color: 'var(--text-main)', flex: 1 }}>
                                             {viaje.destino || `${safeFixed(viaje.destino_lat)}, ${safeFixed(viaje.destino_lng)}`}
-                                        </div>
+                                        </span>
                                     </div>
                                 </div>
 
-                                {/* Rating Section */}
+                                {/* Rating section */}
                                 {viaje.calificacion ? (
-                                    <div className="rating-display" style={{ padding: '1rem', background: 'rgba(245, 158, 11, 0.1)', borderRadius: '0.5rem', borderLeft: '3px solid var(--accent-color)' }}>
-                                        <div style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
-                                            {t('client_dashboard.your_rating')}:
+                                    <div style={{
+                                        padding: '0.75rem 1rem',
+                                        background: 'rgba(245, 158, 11, 0.08)',
+                                        borderRadius: '0.75rem',
+                                        borderLeft: '3px solid var(--accent-color)',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        gap: '0.25rem'
+                                    }}>
+                                        <div style={{ fontSize: '0.7rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                            {t('client_dashboard.your_rating')}
                                         </div>
-                                        {renderStars(viaje.calificacion.puntuacion)}
+                                        <StarRow rating={viaje.calificacion.puntuacion} />
                                         {viaje.calificacion.comentario && (
-                                            <div style={{ marginTop: '0.5rem', fontSize: '0.9rem', color: 'var(--text-main)', fontStyle: 'italic' }}>
+                                            <div style={{ fontSize: '0.82rem', color: 'var(--text-main)', fontStyle: 'italic', marginTop: '0.25rem' }}>
                                                 "{viaje.calificacion.comentario}"
                                             </div>
                                         )}
                                     </div>
-                                ) : (
+                                ) : viaje.estado === 'completado' ? (
                                     <Button
                                         variant="accent"
-                                        onClick={() => openRatingModal(viaje)}
+                                        onClick={() => { setSelectedTrip(viaje); setShowRatingModal(true); }}
                                         className="w-full"
                                     >
                                         ⭐ {t('client_dashboard.rate_trip')}
                                     </Button>
-                                )}
+                                ) : null}
                             </Card>
                         ))}
                     </div>
@@ -206,13 +288,8 @@ const ClienteHistory = () => {
                 <RatingModal
                     tripId={selectedTrip.id}
                     motoristaName={selectedTrip.motorista?.name || 'Motorista'}
-                    onClose={() => {
-                        setShowRatingModal(false);
-                        setSelectedTrip(null);
-                    }}
-                    onSuccess={() => {
-                        fetchHistory(); // Refresh list
-                    }}
+                    onClose={() => { setShowRatingModal(false); setSelectedTrip(null); }}
+                    onSuccess={() => { fetchHistory(); }}
                 />
             )}
         </div>
