@@ -82,6 +82,8 @@
         "phone": "Téléphone",
         "password": "Mot de passe",
         "submit": "Envoyer",
+        "save": "Enregistrer",
+        "cancel": "Annuler",
         "save_changes": "Enregistrer les modifications",
         "saving": "Enregistrement...",
         "back_home": "← Retour à l'accueil",
@@ -199,7 +201,17 @@
         "purchase_success": "Achat réussi !",
         "payment_error": "Erreur lors du traitement du paiement",
         "timeout_error": "Délai expiré. Veuillez vérifier votre solde.",
-        "selected": "SÉLECTIONNÉ"
+        "selected": "SÉLECTIONNÉ",
+        "checkout_title": "Finaliser l'Achat",
+        "select_gateway": "Sélectionnez votre mode de paiement",
+        "gateway_om": "Orange Money",
+        "gateway_moov": "Moov Money",
+        "confirm_details": "Résumé de la Commande",
+        "pay_now": "Payer Maintenant",
+        "total_to_pay": "Total à payer",
+        "pack_name": "Forfait",
+        "trip_units": "Trajets inclus",
+        "selected_gateway": "Mode de paiement sélectionné"
     },
     "admin_dashboard": {
         "welcome": "Bienvenue, {{name}} 👋",
@@ -532,7 +544,9 @@
         "enter_password_confirm": "Veuillez entrer votre mot de passe pour confirmer :",
         "default_plan_name": "Plan Standard",
         "account_deleted": "Compte supprimé avec succès",
-        "delete_error": "Erreur lors de la suppression du compte"
+        "delete_error": "Erreur lors de la suppression du compte",
+        "danger_zone_desc": "Cette action est permanente et irréversible",
+        "delete_warning": "Votre compte, vos données personnelles, forfaits actifs et historique de voyages seront supprimés."
     },
     "profile": {
         "preferences": "Préférences",

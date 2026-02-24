@@ -192,76 +192,164 @@ const ClienteForfaits = () => {
                     </div>
                 )}
 
-                {/* Payment Section */}
+                {/* Payment Section - Redesigned for Transparency */}
                 {selectedForfait && (
                     <Card style={{
                         marginTop: '2rem',
-                        maxWidth: '38rem',
+                        maxWidth: '42rem',
                         width: '100%',
-                        margin: '0 auto',
-                        boxSizing: 'border-box'
+                        margin: '2rem auto 0',
+                        boxSizing: 'border-box',
+                        border: '1px solid var(--primary-color)',
+                        boxShadow: '0 8px 30px rgba(37, 99, 235, 0.1)'
                     }}>
-                        <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--text-main)' }}>
-                            <img src="/om-logo.png" onError={(e) => e.target.style.display = 'none'} alt="" style={{ height: '24px' }} />
-                            {t('client_forfaits.payment_title')}
-                        </h2>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+                            <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', margin: 0, color: 'var(--text-main)' }}>
+                                🛒 {t('client_forfaits.checkout_title')}
+                            </h2>
+                            <Button variant="ghost" onClick={() => { setSelectedForfait(null); setStatusMessage(null); }} size="sm">
+                                ✕
+                            </Button>
+                        </div>
 
-                        <form onSubmit={handleBuy}>
-                            <div style={{ marginBottom: '2rem' }}>
-                                <label className="form-label">
-                                    {t('client_forfaits.phone_label')}
-                                </label>
-                                <div style={{ position: 'relative' }}>
-                                    <input
-                                        type="text"
-                                        value={phoneNumber}
-                                        onChange={(e) => setPhoneNumber(e.target.value)}
-                                        placeholder={t('client_forfaits.phone_placeholder')}
-                                        className="mtx-input"
-                                        style={{ paddingLeft: '3rem' }}
-                                        required
-                                        pattern="\d{8,}"
-                                        disabled={processing}
-                                    />
-                                    <span style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', fontSize: '1.2rem' }}>📱</span>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
+                            {/* Left: Order Summary */}
+                            <div style={{ background: 'var(--bg-light)', padding: '1.5rem', borderRadius: '1rem' }}>
+                                <h3 style={{ fontSize: '0.9rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '1rem', fontWeight: 'bold' }}>
+                                    {t('client_forfaits.confirm_details')}
+                                </h3>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                        <span style={{ color: 'var(--text-muted)' }}>{t('client_forfaits.pack_name')}:</span>
+                                        <span style={{ fontWeight: 'bold' }}>{t(`plans.${selectedForfait.nombre}`, selectedForfait.nombre)}</span>
+                                    </div>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                        <span style={{ color: 'var(--text-muted)' }}>{t('client_forfaits.trip_units')}:</span>
+                                        <span style={{ fontWeight: 'bold' }}>{selectedForfait.viajes_incluidos || selectedForfait.viajes}</span>
+                                    </div>
+                                    <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <span style={{ fontWeight: 'bold', color: 'var(--text-main)' }}>{t('client_forfaits.total_to_pay')}:</span>
+                                        <span style={{ fontSize: '1.5rem', fontWeight: '900', color: 'var(--primary-color)' }}>
+                                            {selectedForfait.precio.toLocaleString()} CFA
+                                        </span>
+                                    </div>
                                 </div>
-                                <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginTop: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                    <span>ℹ️</span>
-                                    <span dangerouslySetInnerHTML={{ __html: t('client_forfaits.debit_warning', { amount: selectedForfait.precio }) }} />
-                                </p>
                             </div>
 
-                            {statusMessage && (
-                                <div style={{
-                                    padding: '1rem',
-                                    marginBottom: '1.5rem',
-                                    backgroundColor: statusMessage.type === 'error' ? 'var(--bg-light)' : 'rgba(37, 99, 235, 0.05)',
-                                    color: statusMessage.type === 'error' ? 'var(--error-color)' : 'var(--primary-color)',
-                                    borderRadius: '0.75rem',
-                                    textAlign: 'center',
-                                    fontSize: '0.95rem',
-                                    border: `1px solid ${statusMessage.type === 'error' ? 'var(--error-color)' : 'var(--primary-color)'}`
-                                }}>
-                                    {statusMessage.text}
-                                    {processing && <div style={{ marginTop: '0.5rem', fontWeight: 'bold' }}>⏳ {t('client_forfaits.waiting')}</div>}
-                                </div>
-                            )}
-
-                            <Button
-                                type="submit"
-                                disabled={processing}
-                                className="w-full"
-                            >
-                                {processing ? (
-                                    <>{t('client_forfaits.processing')}</>
-                                ) : (
+                            {/* Right: Payment Logic */}
+                            <div>
+                                {!statusMessage && !processing ? (
                                     <>
-                                        <span>💳</span>
-                                        {t('client_forfaits.pay_btn', { amount: selectedForfait.precio })}
+                                        <h3 style={{ fontSize: '0.9rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '1rem', fontWeight: 'bold' }}>
+                                            {t('client_forfaits.select_gateway')}
+                                        </h3>
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
+                                            <div
+                                                onClick={() => setStatusMessage(null)}
+                                                style={{
+                                                    border: '2px solid var(--primary-color)',
+                                                    borderRadius: '0.75rem',
+                                                    padding: '0.75rem',
+                                                    textAlign: 'center',
+                                                    cursor: 'pointer',
+                                                    background: 'rgba(37, 99, 235, 0.05)'
+                                                }}
+                                            >
+                                                <div style={{ fontSize: '1.5rem', marginBottom: '0.25rem' }}>🟠</div>
+                                                <div style={{ fontSize: '0.75rem', fontWeight: 'bold' }}>{t('client_forfaits.gateway_om')}</div>
+                                            </div>
+                                            <div
+                                                style={{
+                                                    border: '1px solid var(--border-color)',
+                                                    borderRadius: '0.75rem',
+                                                    padding: '0.75rem',
+                                                    textAlign: 'center',
+                                                    opacity: 0.6,
+                                                    cursor: 'not-allowed'
+                                                }}
+                                            >
+                                                <div style={{ fontSize: '1.5rem', marginBottom: '0.25rem' }}>🔵</div>
+                                                <div style={{ fontSize: '0.75rem', fontWeight: 'bold' }}>{t('client_forfaits.gateway_moov')}</div>
+                                            </div>
+                                        </div>
+
+                                        <form onSubmit={handleBuy}>
+                                            <div style={{ marginBottom: '1.5rem' }}>
+                                                <label className="form-label" style={{ fontSize: '0.8rem' }}>
+                                                    {t('client_forfaits.phone_label')}
+                                                </label>
+                                                <div style={{ position: 'relative' }}>
+                                                    <input
+                                                        type="text"
+                                                        value={phoneNumber}
+                                                        onChange={(e) => setPhoneNumber(e.target.value)}
+                                                        placeholder={t('client_forfaits.phone_placeholder')}
+                                                        className="mtx-input"
+                                                        style={{ paddingLeft: '2.5rem', fontSize: '0.9rem' }}
+                                                        required
+                                                        pattern="\d{8,}"
+                                                        disabled={processing}
+                                                    />
+                                                    <span style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)' }}>📱</span>
+                                                </div>
+                                            </div>
+
+                                            <Button type="submit" className="w-full" size="lg">
+                                                {t('client_forfaits.pay_now')}
+                                            </Button>
+                                        </form>
                                     </>
+                                ) : (
+                                    <div style={{
+                                        height: '100%',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        justifyContent: 'center',
+                                        textAlign: 'center',
+                                        padding: '1rem'
+                                    }}>
+                                        {statusMessage?.type === 'info' && (
+                                            <>
+                                                <div style={{
+                                                    width: '3.5rem', height: '3.5rem',
+                                                    border: '4px solid #e2e8f0',
+                                                    borderTopColor: 'var(--primary-color)',
+                                                    borderRadius: '50%',
+                                                    animation: 'spin 1s linear infinite',
+                                                    margin: '0 auto 1.5rem'
+                                                }} />
+                                                <h4 style={{ margin: '0 0 0.5rem', color: 'var(--primary-color)' }}>{t('client_forfaits.processing')}</h4>
+                                                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{statusMessage.text}</p>
+                                                <div style={{ marginTop: '1rem', fontWeight: 'bold', fontSize: '0.9rem', color: 'var(--text-main)' }}>
+                                                    📲 {t('client_forfaits.waiting')}
+                                                </div>
+                                            </>
+                                        )}
+                                        {statusMessage?.type === 'error' && (
+                                            <>
+                                                <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>❌</div>
+                                                <h4 style={{ margin: '0 0 0.5rem', color: 'var(--error-color)' }}>{t('common.error')}</h4>
+                                                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1.5rem' }}>{statusMessage.text}</p>
+                                                <Button variant="outline" size="sm" onClick={() => setStatusMessage(null)}>
+                                                    {t('common.back')}
+                                                </Button>
+                                            </>
+                                        )}
+                                        {statusMessage?.type === 'success' && (
+                                            <>
+                                                <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>✅</div>
+                                                <h4 style={{ margin: '0 0 0.5rem', color: '#10b981' }}>{t('common.success')}</h4>
+                                                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{statusMessage.text}</p>
+                                            </>
+                                        )}
+                                    </div>
                                 )}
-                            </Button>
-                        </form>
+                            </div>
+                        </div>
+
+                        <div style={{ marginTop: '1.5rem', fontSize: '0.75rem', color: 'var(--text-muted)', textAlign: 'center', borderTop: '1px solid var(--border-color)', paddingTop: '1rem' }}>
+                            🔒 {t('auth.rgpd_notice')}
+                        </div>
                     </Card>
                 )}
             </main>

@@ -87,6 +87,8 @@
         "phone": "Teléfono",
         "password": "Contraseña",
         "submit": "Enviar",
+        "save": "Guardar",
+        "cancel": "Cancelar",
         "save_changes": "Guardar Cambios",
         "saving": "Guardando...",
         "back_home": "← Volver al inicio",
@@ -204,7 +206,17 @@
         "purchase_success": "¡Compra realizada con éxito!",
         "payment_error": "Error al procesar el pago",
         "timeout_error": "Tiempo de espera agotado. Verifica tu saldo.",
-        "selected": "SELECCIONADO"
+        "selected": "SELECCIONADO",
+        "checkout_title": "Finalizar Compra",
+        "select_gateway": "Selecciona tu método de pago",
+        "gateway_om": "Orange Money",
+        "gateway_moov": "Moov Money",
+        "confirm_details": "Resumen del Pedido",
+        "pay_now": "Pagar Ahora",
+        "total_to_pay": "Total a pagar",
+        "pack_name": "Paquete",
+        "trip_units": "Viajes incluidos",
+        "selected_gateway": "Método de pago seleccionado"
     },
     "admin_dashboard": {
         "welcome": "Bienvenido, {{name}} 👋",
@@ -552,7 +564,9 @@
         "enter_password_confirm": "Por favor, introduce tu contraseña para confirmar:",
         "default_plan_name": "Plan Estándar",
         "account_deleted": "Cuenta eliminada correctamente",
-        "delete_error": "Error al eliminar la cuenta"
+        "delete_error": "Error al eliminar la cuenta",
+        "danger_zone_desc": "Esta acción es permanente e irreversible",
+        "delete_warning": "Se eliminarán tu cuenta, datos personales, forfaits activos e historial de viajes."
     },
     "profile": {
         "preferences": "Preferencias",
