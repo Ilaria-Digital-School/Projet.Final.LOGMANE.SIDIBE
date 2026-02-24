@@ -370,7 +370,7 @@ const ClienteDashboard = () => {
                 </div>
 
                 {/* Desktop Nav */}
-                <div className="desktop-nav" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                <div className="desktop-nav" style={{ gap: '1rem', alignItems: 'center' }}>
                     <Badge variant="premium">
                         {t('client_dashboard.trips_badge', { count: viajesDisponibles })}
                     </Badge>

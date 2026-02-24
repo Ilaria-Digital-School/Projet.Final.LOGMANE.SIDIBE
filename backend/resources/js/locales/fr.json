@@ -178,7 +178,11 @@
         "vehicle": "Véhicule",
         "plate": "Immatriculation",
         "safety_code": "Code de Sécurité",
-        "waiting_for_assignment": "En attente d'assignation..."
+        "waiting_for_assignment": "En attente d'assignation...",
+        "no_trips_desc": "Vous n'avez pas encore effectué de voyage.",
+        "total_trips": "Total trajets",
+        "completed": "Terminés",
+        "rated": "Notés"
     },
     "client_forfaits": {
         "title": "Acheter des Forfaits",

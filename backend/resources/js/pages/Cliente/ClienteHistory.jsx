@@ -88,7 +88,7 @@ const ClienteHistory = () => {
 
             {/* ─── Header ─── */}
             <header className="mtx-header">
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flex: 1, minWidth: 0 }}>
                     <div style={{
                         background: 'var(--secondary-color)',
                         width: '2.5rem', height: '2.5rem',
@@ -96,9 +96,11 @@ const ClienteHistory = () => {
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         fontSize: '1.1rem', flexShrink: 0
                     }}>📋</div>
-                    <div>
+                    <div style={{ minWidth: 0 }}>
                         <h1 className="header-title">{t('client_dashboard.history')}</h1>
-                        <span className="header-subtitle">{user?.name || t('auth.role_client')}</span>
+                        <span className="header-subtitle" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}>
+                            {user?.name || t('auth.role_client')}
+                        </span>
                     </div>
                 </div>
                 <div className="desktop-nav">

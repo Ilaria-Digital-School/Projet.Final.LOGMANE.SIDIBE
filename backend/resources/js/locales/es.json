@@ -183,7 +183,11 @@
         "vehicle": "Vehículo",
         "plate": "Matrícula",
         "safety_code": "Código de Seguridad",
-        "waiting_for_assignment": "Esperando asignación de conductor..."
+        "waiting_for_assignment": "Esperando asignación de conductor...",
+        "no_trips_desc": "Aún no has realizado ningún viaje.",
+        "total_trips": "Total viajes",
+        "completed": "Completados",
+        "rated": "Calificados"
     },
     "client_forfaits": {
         "title": "Comprar Forfaits",

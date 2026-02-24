@@ -342,7 +342,7 @@
 
 @media (max-width: 768px) {
     .desktop-nav {
-        display: none;
+        display: none !important;
     }
 
     .mobile-balance-badge {
