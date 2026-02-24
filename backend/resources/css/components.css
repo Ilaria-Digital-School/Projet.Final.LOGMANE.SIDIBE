@@ -357,6 +357,31 @@
         overflow-x: hidden;
     }
 
+    .mtx-header-logo {
+        display: none;
+        /* hide logo on mobile to save space */
+    }
+
+    .main-content {
+        flex-direction: column;
+        height: auto;
+        overflow: visible;
+        padding: 1rem;
+        gap: 1rem;
+    }
+
+    .side-panel {
+        flex: none;
+        width: 100%;
+        overflow-y: visible;
+        padding-right: 0;
+    }
+
+    .map-panel {
+        min-height: 300px;
+        height: 300px;
+    }
+
     .header-title {
         font-size: 1.1rem;
     }

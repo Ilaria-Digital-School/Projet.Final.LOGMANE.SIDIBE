@@ -356,7 +356,7 @@ const ClienteDashboard = () => {
             {/* Header */}
             <header className="mtx-header">
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <img src="/logo.png" alt="MotoTX Logo" className="mtx-header-logo" style={{ height: '3.5rem', objectFit: 'contain' }} />
+                    <img src="/logo.png" alt="MotoTX Logo" className="mtx-header-logo" />
                     <div>
                         <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: 'var(--primary-color)', margin: 0 }}>MotoTX</h1>
                         <span style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>
