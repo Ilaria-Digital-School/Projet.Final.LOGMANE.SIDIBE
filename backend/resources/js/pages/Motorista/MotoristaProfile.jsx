@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import SEO from '../../components/Common/SEO';
 import { Card, Button, Badge } from '../../components/Common/UIComponents';
+import { User, Mail, Phone, Settings, ShieldCheck, Bike, Calendar, Star, LogOut, LayoutDashboard, History, CheckCircle } from 'lucide-react';
 import '../../../css/components.css';
 
 /**
@@ -84,7 +85,9 @@ const MotoristaProfile = () => {
 
             <header className="mtx-header driver-header">
                 <div className="mtx-header-brand">
-                    <div className="mtx-header-icon">🛵</div>
+                    <div className="mtx-header-icon premium">
+                        <User size={24} className="text-white" />
+                    </div>
                     <div className="mtx-header-text">
                         <h1 className="header-title">
                             {t('driver_dashboard.profile')}
@@ -93,8 +96,8 @@ const MotoristaProfile = () => {
                     </div>
                 </div>
                 <div className="desktop-nav">
-                    <Button onClick={() => navigate('/motorista')} label="Dashboard">
-                        ← Dashboard
+                    <Button onClick={() => navigate('/motorista')} variant="ghost" className="btn--sm">
+                        <LayoutDashboard size={18} /> Dashboard
                     </Button>
                 </div>
             </header>
@@ -102,185 +105,241 @@ const MotoristaProfile = () => {
             {/* Mobile Bottom Nav */}
             <nav className="mobile-bottom-nav">
                 <Button variant="ghost" onClick={() => navigate('/motorista')} label="Dashboard">
-                    <span style={{ fontSize: '1.25rem' }}>🏠</span>
+                    <LayoutDashboard size={20} />
                     {t('nav.dashboard')}
                 </Button>
                 <Button variant="ghost" onClick={() => navigate('/motorista/history')} label={t('client_dashboard.history')}>
-                    <span style={{ fontSize: '1.25rem' }}>📋</span>
+                    <History size={20} />
                     {t('client_dashboard.history')}
                 </Button>
                 <Button variant="ghost" className="active" label={t('client_dashboard.profile')}>
-                    <span style={{ fontSize: '1.25rem' }}>👤</span>
+                    <User size={20} />
                     {t('client_dashboard.profile')}
                 </Button>
             </nav>
 
-            <main className="main-content-centered mtx-profile-grid">
-                <Card className="profile-info-card">
-                    <h2 className="card-title-section">
-                        👤 {t('driver_dashboard.personal_data')}
-                    </h2>
-
-                    <form onSubmit={handleSubmit} style={{ display: 'grid', gap: '1.25rem' }}>
-                        <div>
-                            <label className="form-label">{t('common.name')}</label>
-                            <input
-                                type="text"
-                                value={formData.name}
-                                onChange={e => setFormData({ ...formData, name: e.target.value })}
-                                className="mtx-input"
-                            />
+            <main className="main-content-centered">
+                {/* Driver Identity Card - Premium Feature */}
+                <div className="driver-id-card animate-in fade-in slide-in-from-bottom-4">
+                    <div className="id-card-header">
+                        <div className="driver-avatar-container">
+                            <div className="driver-avatar-placeholder">
+                                {formData.name?.charAt(0) || 'D'}
+                            </div>
+                            <div className="verified-badge-glow">
+                                <ShieldCheck size={16} fill="#10b981" />
+                            </div>
                         </div>
-                        <div>
-                            <label className="form-label">{t('common.email')}</label>
-                            <input
-                                type="email"
-                                value={formData.email}
-                                onChange={e => setFormData({ ...formData, email: e.target.value })}
-                                className="mtx-input"
-                            />
-                        </div>
-                        {/* Preferences */}
-                        <Card className="profile-section">
-                            <h3 className="section-title">⚙️ {t('profile.preferences')}</h3>
-                            <div className="preferences-list">
-                                <div className="pref-item">
-                                    <span>🔔 {t('profile.notifications')}</span>
-                                    <Button
-                                        variant="outline"
-                                        className="btn-sm"
-                                        onClick={() => {
-                                            if (!("Notification" in window)) {
-                                                alert(t('profile.browser_no_notifications'));
-                                            } else if (Notification.permission === "granted") {
-                                                new Notification("MotoTX", { body: t('profile.notification_test_body') });
-                                            } else if (Notification.permission !== "denied") {
-                                                Notification.requestPermission().then(permission => {
-                                                    if (permission === "granted") {
-                                                        new Notification("MotoTX", { body: t('profile.notification_thanks') });
-                                                    }
-                                                });
-                                            }
-                                        }}
-                                    >
-                                        {t('profile.test_notification')}
-                                    </Button>
+                        <div className="driver-main-info">
+                            <h2 className="driver-name-display">{formData.name || 'Motorista'}</h2>
+                            <div className="driver-meta-badges">
+                                <Badge variant="premium" className="badge--sm">
+                                    <ShieldCheck size={12} style={{ marginRight: '4px' }} />
+                                    {t('driver_dashboard.enabled')}
+                                </Badge>
+                                <div className="member-since">
+                                    <Calendar size={12} />
+                                    <span>Member since 2024</span>
                                 </div>
                             </div>
-                        </Card>
-                        <div>
-                            <label className="form-label">{t('common.phone')}</label>
-                            <input
-                                type="text"
-                                value={formData.telefono}
-                                onChange={e => setFormData({ ...formData, telefono: e.target.value })}
-                                className="mtx-input"
-                            />
                         </div>
+                    </div>
 
-                        <Button
-                            type="submit"
-                            disabled={saving}
-                            className="w-full"
-                        >
-                            {saving ? t('common.saving') : t('common.save_changes')}
-                        </Button>
-                    </form>
+                    <div className="id-card-stats">
+                        <div className="id-stat-item">
+                            <span className="id-stat-label">{t('driver_dashboard.average_rating')}</span>
+                            <div className="id-stat-value">
+                                <Star size={16} fill="#f59e0b" className="text-accent" />
+                                <span>4.8</span>
+                            </div>
+                        </div>
+                        <div className="id-stat-divider"></div>
+                        <div className="id-stat-item">
+                            <span className="id-stat-label">{t('driver_dashboard.completed_trips')}</span>
+                            <div className="id-stat-value">
+                                <CheckCircle size={16} className="text-secondary" />
+                                <span>124</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-                    <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid var(--border-color)' }}>
-                        <h3 style={{ fontSize: '1rem', color: 'var(--error-color)', marginBottom: '0.5rem' }}>{t('client_profile.danger_zone')}</h3>
-                        <Button
-                            onClick={async () => {
-                                const password = window.prompt(t('client_profile.enter_password_confirm'));
-                                if (!password) return;
+                <div className="mtx-profile-grid" style={{ marginTop: '2rem' }}>
+                    <Card className="profile-info-card">
+                        <h2 className="card-title-section">
+                            <User size={20} className="text-secondary" /> {t('driver_dashboard.personal_data')}
+                        </h2>
 
-                                if (window.confirm(t('client_profile.delete_confirm'))) {
-                                    try {
-                                        await axios.delete('/api/profile', {
-                                            data: { password }
-                                        });
-                                        toast.success(t('client_profile.account_deleted'));
-                                        logout();
-                                        navigate('/');
-                                    } catch (error) {
-                                        toast.error(error.response?.data?.message || t('client_profile.delete_error'));
+                        <form onSubmit={handleSubmit} className="mtx-modern-form">
+                            <div className="input-group-modern">
+                                <label className="form-label">
+                                    <User size={14} /> {t('common.name')}
+                                </label>
+                                <input
+                                    type="text"
+                                    value={formData.name}
+                                    onChange={e => setFormData({ ...formData, name: e.target.value })}
+                                    className="mtx-input"
+                                />
+                            </div>
+                            <div className="input-group-modern">
+                                <label className="form-label">
+                                    <Mail size={14} /> {t('common.email')}
+                                </label>
+                                <input
+                                    type="email"
+                                    value={formData.email}
+                                    onChange={e => setFormData({ ...formData, email: e.target.value })}
+                                    className="mtx-input"
+                                />
+                            </div>
+
+                            <div className="input-group-modern">
+                                <label className="form-label">
+                                    <Phone size={14} /> {t('common.phone')}
+                                </label>
+                                <input
+                                    type="text"
+                                    value={formData.telefono}
+                                    onChange={e => setFormData({ ...formData, telefono: e.target.value })}
+                                    className="mtx-input"
+                                />
+                            </div>
+
+                            {/* Preferences - Simplified in profile */}
+                            <div className="preferences-mini-card">
+                                <div className="pref-header">
+                                    <Settings size={16} />
+                                    <span>{t('profile.preferences')}</span>
+                                </div>
+                                <Button
+                                    variant="outline"
+                                    type="button"
+                                    className="btn--sm w-full"
+                                    onClick={() => {
+                                        if (!("Notification" in window)) {
+                                            alert(t('profile.browser_no_notifications'));
+                                        } else if (Notification.permission === "granted") {
+                                            new Notification("MotoTX", { body: t('profile.notification_test_body') });
+                                        } else if (Notification.permission !== "denied") {
+                                            Notification.requestPermission().then(permission => {
+                                                if (permission === "granted") {
+                                                    new Notification("MotoTX", { body: t('profile.notification_thanks') });
+                                                }
+                                            });
+                                        }
+                                    }}
+                                >
+                                    {t('profile.test_notification')}
+                                </Button>
+                            </div>
+
+                            <Button
+                                type="submit"
+                                disabled={saving}
+                                className="btn--block"
+                            >
+                                {saving ? t('common.saving') : t('common.save_changes')}
+                            </Button>
+                        </form>
+
+                        <div className="danger-zone-compact">
+                            <h3 className="danger-title">{t('client_profile.danger_zone')}</h3>
+                            <Button
+                                onClick={async () => {
+                                    const password = window.prompt(t('client_profile.enter_password_confirm'));
+                                    if (!password) return;
+
+                                    if (window.confirm(t('client_profile.delete_confirm'))) {
+                                        try {
+                                            await axios.delete('/api/profile', {
+                                                data: { password }
+                                            });
+                                            toast.success(t('client_profile.account_deleted'));
+                                            logout();
+                                            navigate('/');
+                                        } catch (error) {
+                                            toast.error(error.response?.data?.message || t('client_profile.delete_error'));
+                                        }
                                     }
-                                }
-                            }}
-                            variant="error"
-                            className="w-full"
-                        >
-                            {t('client_profile.delete_account')}
-                        </Button>
-                    </div>
-                </Card>
-
-                {/* Vehicle Info */}
-                <Card className="profile-vehicle-card">
-                    <h2 className="card-title-section">
-                        🏍️ {t('driver_dashboard.your_vehicle')}
-                    </h2>
-
-                    <div style={{ display: 'grid', gap: '1rem' }}>
-                        <div style={{ display: 'grid', gap: '0.5rem' }}>
-                            <label className="form-label">{t('driver_dashboard.license_plate')}</label>
-                            <input
-                                type="text"
-                                value={motoInfo.matricula || ''}
-                                onChange={e => setMotoInfo({ ...motoInfo, matricula: e.target.value })}
-                                className="mtx-input"
-                                style={{ fontWeight: 'bold', fontFamily: 'monospace' }}
-                            />
+                                }}
+                                variant="error"
+                                className="btn--sm w-full btn--ghost"
+                            >
+                                <LogOut size={14} /> {t('client_profile.delete_account')}
+                            </Button>
                         </div>
+                    </Card>
 
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                            <div>
-                                <label className="form-label">{t('driver_dashboard.model')}</label>
-                                <input
-                                    type="text"
-                                    value={motoInfo.modelo_moto || ''}
-                                    onChange={e => setMotoInfo({ ...motoInfo, modelo_moto: e.target.value })}
-                                    className="mtx-input"
-                                />
+                    {/* Vehicle Info */}
+                    <div className="vehicle-perspective-container">
+                        <Card className="profile-vehicle-card-v2">
+                            <div className="vehicle-card-header">
+                                <Bike size={32} className="text-secondary opacity-20" />
+                                <h2 className="card-title-section-modern">
+                                    {t('driver_dashboard.your_vehicle')}
+                                </h2>
                             </div>
-                            <div>
-                                <label className="form-label">{t('driver_dashboard.year')}</label>
-                                <input
-                                    type="text"
-                                    value={motoInfo.anio_moto || ''}
-                                    onChange={e => setMotoInfo({ ...motoInfo, anio_moto: e.target.value })}
-                                    className="mtx-input"
-                                />
-                            </div>
-                        </div>
 
-                        <div>
-                            <label className="form-label">{t('driver_dashboard.color')}</label>
-                            <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                <input
-                                    type="text"
-                                    value={motoInfo.color_moto || ''}
-                                    onChange={e => setMotoInfo({ ...motoInfo, color_moto: e.target.value })}
-                                    className="mtx-input"
-                                />
-                                {motoInfo.color_moto && (
-                                    <div style={{
-                                        width: '40px',
-                                        height: '40px',
-                                        borderRadius: '0.5rem',
-                                        backgroundColor: motoInfo.color_moto,
-                                        border: '1px solid var(--border-color)',
-                                        flexShrink: 0
-                                    }}></div>
-                                )}
+                            <div className="vehicle-form-grid">
+                                <div className="input-group-modern col-span-2">
+                                    <label className="form-label">{t('driver_dashboard.license_plate')}</label>
+                                    <div className="license-plate-input-wrapper">
+                                        <input
+                                            type="text"
+                                            value={motoInfo.matricula || ''}
+                                            onChange={e => setMotoInfo({ ...motoInfo, matricula: e.target.value })}
+                                            className="mtx-input-plate"
+                                            placeholder="ML-0000-XX"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="input-group-modern">
+                                    <label className="form-label">{t('driver_dashboard.model')}</label>
+                                    <input
+                                        type="text"
+                                        value={motoInfo.modelo_moto || ''}
+                                        onChange={e => setMotoInfo({ ...motoInfo, modelo_moto: e.target.value })}
+                                        className="mtx-input"
+                                    />
+                                </div>
+                                <div className="input-group-modern">
+                                    <label className="form-label">{t('driver_dashboard.year')}</label>
+                                    <input
+                                        type="text"
+                                        value={motoInfo.anio_moto || ''}
+                                        onChange={e => setMotoInfo({ ...motoInfo, anio_moto: e.target.value })}
+                                        className="mtx-input"
+                                    />
+                                </div>
+
+                                <div className="input-group-modern col-span-2">
+                                    <label className="form-label">{t('driver_dashboard.color')}</label>
+                                    <div className="color-input-wrapper">
+                                        <input
+                                            type="text"
+                                            value={motoInfo.color_moto || ''}
+                                            onChange={e => setMotoInfo({ ...motoInfo, color_moto: e.target.value })}
+                                            className="mtx-input"
+                                        />
+                                        {motoInfo.color_moto && (
+                                            <div
+                                                className="color-preview-node"
+                                                style={{ backgroundColor: motoInfo.color_moto }}
+                                            ></div>
+                                        )}
+                                    </div>
+                                </div>
                             </div>
-                        </div>
+
+                            <div className="vehicle-support-alert">
+                                <ShieldCheck size={14} />
+                                <span>{t('driver_dashboard.vehicle_support_note')}</span>
+                            </div>
+                        </Card>
                     </div>
-
-                    <div style={{ marginTop: '1.5rem', fontSize: '0.875rem', color: 'var(--text-muted)', textAlign: 'center', fontStyle: 'italic' }}>
-                        * {t('driver_dashboard.vehicle_support_note')}
-                    </div>
-                </Card>
+                </div>
             </main>
         </div>
     );

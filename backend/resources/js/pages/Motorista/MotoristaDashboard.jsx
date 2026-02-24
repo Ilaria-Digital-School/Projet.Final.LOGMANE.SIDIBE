@@ -11,7 +11,7 @@ import { Card, Button, Badge, Modal } from '../../components/Common/UIComponents
 import LanguageSwitcher from '../../components/Common/LanguageSwitcher';
 import TripPhaseTracker from '../../components/Viaje/TripPhaseTracker';
 import '../../../css/components.css';
-import { Star } from 'lucide-react';
+import { Star, LayoutDashboard, History, User, LogOut } from 'lucide-react';
 
 /**
  * MotoristaDashboard Component
@@ -301,19 +301,19 @@ const MotoristaDashboard = () => {
             {/* Mobile Bottom Nav */}
             <nav className="mobile-bottom-nav">
                 <Button variant="ghost" className="active" label={t('nav.dashboard')}>
-                    <span style={{ fontSize: '1.25rem' }}>🏠</span>
+                    <LayoutDashboard size={20} />
                     {t('nav.dashboard')}
                 </Button>
                 <Button variant="ghost" onClick={() => navigate('/motorista/historial')} label={t('client_dashboard.history')}>
-                    <span style={{ fontSize: '1.25rem' }}>📋</span>
+                    <History size={20} />
                     {t('client_dashboard.history')}
                 </Button>
                 <Button variant="ghost" onClick={() => navigate('/motorista/perfil')} label={t('client_dashboard.profile')}>
-                    <span style={{ fontSize: '1.25rem' }}>👤</span>
+                    <User size={20} />
                     {t('client_dashboard.profile')}
                 </Button>
                 <Button variant="ghost" onClick={handleLogout} label={t('common.logout')} className="text-error">
-                    <span style={{ fontSize: '1.25rem' }}>🚪</span>
+                    <LogOut size={20} />
                     {t('common.logout')}
                 </Button>
             </nav>
