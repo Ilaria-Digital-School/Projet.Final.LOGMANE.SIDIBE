@@ -48,6 +48,7 @@ const MotoristaDashboard = () => {
     const [rating, setRating] = useState(5);
     const [comment, setComment] = useState('');
     const [lastFinishedTripId, setLastFinishedTripId] = useState(null);
+    const [isTogglingStatus, setIsTogglingStatus] = useState(false);
 
     const fetchData = async () => {
         setLoading(true);
@@ -62,7 +63,10 @@ const MotoristaDashboard = () => {
             try {
                 const profileRes = await axios.get('/api/motorista/perfil');
                 setProfile(profileRes.data);
-                setIsOnline(profileRes.data.estado_actual === 'activo');
+                // Only update online status if we are NOT currently toggling it manually
+                if (!isTogglingStatus) {
+                    setIsOnline(profileRes.data.estado_actual === 'activo');
+                }
             } catch (e) { }
 
             const activeRes = await axios.get('/api/viajes/actual');
@@ -139,12 +143,27 @@ const MotoristaDashboard = () => {
     };
 
     const handleToggleStatus = async () => {
+        if (isTogglingStatus) return; // Prevent multiple clicks
+
         const newStatus = !isOnline ? 'activo' : 'inactivo';
+
+        // Optimistic UI update
+        setIsOnline(!isOnline);
+        setIsTogglingStatus(true);
+
         try {
             await axios.put('/api/motorista/status', { estado_actual: newStatus });
-            setIsOnline(!isOnline);
             toast.success(newStatus === 'activo' ? t('driver_dashboard.online_msg') : t('driver_dashboard.offline_msg'));
+
+            // Short delay before allowing background polling to take over again
+            setTimeout(() => {
+                setIsTogglingStatus(false);
+            }, 3000);
         } catch (error) {
+            // Revert on error
+            setIsOnline(isOnline);
+            setIsTogglingStatus(false);
+
             if (error.response && error.response.status === 403) {
                 toast.error(t('driver_dashboard.subscription_required'));
                 setTimeout(() => navigate('/motorista/suscripciones'), 1500);
