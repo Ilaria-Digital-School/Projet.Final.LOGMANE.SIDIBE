@@ -25,5 +25,6 @@ class PlanMotorista extends Model
         'precio',
         'dias_validez',
         'es_vip',
+        'distancia_maxima',
     ];
 }

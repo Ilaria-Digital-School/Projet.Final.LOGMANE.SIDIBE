@@ -3,6 +3,7 @@ import axios from 'axios';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import AdminMap from './AdminMap';
 
 /**
  * AdminViajes Component
@@ -99,6 +100,7 @@ const AdminViajes = () => {
                 <div>{t('common.loading')}</div>
             ) : (
                 <>
+                    <AdminMap />
                     {/* Desktop Table View */}
                     {!isMobile && (
                         <div className="mtx-card" style={{ overflowX: 'auto', padding: 0 }}>

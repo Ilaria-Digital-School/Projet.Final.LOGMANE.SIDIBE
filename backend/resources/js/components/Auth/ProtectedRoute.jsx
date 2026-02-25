@@ -24,6 +24,7 @@ const ProtectedRoute = ({ allowedRoles }) => {
     }
 
     if (allowedRoles && user && !allowedRoles.includes(user.rol)) {
+        console.warn(`[ProtectedRoute] Access denied. User role: "${user.rol}", Required: ${allowedRoles.join(', ')}`);
         return <Navigate to="/" replace />;
     }
 

@@ -54,7 +54,7 @@ const AdminDashboard = () => {
                 axios.get('/api/admin/chart-data')
             ]);
 
-            setStats(statsRes.data);
+            setStats(statsRes.data || {});
 
             // Ensure chartData is always an array
             if (Array.isArray(chartRes.data)) {

@@ -34,3 +34,7 @@ Broadcast::channel('viaje.{viajeId}', function ($user, $viajeId) {
 Broadcast::channel('viajes.disponibles', function ($user) {
     return $user->rol === 'motorista' && $user->motorista_perfil?->estado_validacion === 'aprobado';
 });
+
+Broadcast::channel('admin.monitoring', function ($user) {
+    return $user->rol === 'admin';
+});

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Services\ForfaitService;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Pagos\StoreForfaitRequest;
 use App\Http\Requests\Pagos\UpdateForfaitRequest;
 
 /**

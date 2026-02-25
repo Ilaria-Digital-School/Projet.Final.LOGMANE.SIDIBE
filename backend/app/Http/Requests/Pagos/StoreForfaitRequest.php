@@ -26,8 +26,10 @@ class StoreForfaitRequest extends FormRequest
             'nombre' => 'required|string|max:255',
             'descripcion' => 'nullable|string',
             'precio' => 'required|numeric|min:0',
-            'viajes_incluidos' => 'required|integer|min:1',
+            'viajes_incluidos' => 'required|integer|min:0',
             'dias_validez' => 'required|integer|min:1',
+            'distancia_maxima' => 'nullable|numeric|min:0',
+            'es_vip' => 'nullable|boolean',
             'estado' => ['required', Rule::in(['activo', 'inactivo'])],
         ];
     }

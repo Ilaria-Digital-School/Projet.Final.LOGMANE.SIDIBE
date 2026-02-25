@@ -26,8 +26,10 @@ class UpdateForfaitRequest extends FormRequest
             'nombre' => 'sometimes|string|max:255',
             'descripcion' => 'nullable|string',
             'precio' => 'sometimes|numeric|min:0',
-            'viajes_incluidos' => 'sometimes|integer|min:1',
+            'viajes_incluidos' => 'sometimes|integer|min:0',
             'dias_validez' => 'sometimes|integer|min:1',
+            'distancia_maxima' => 'sometimes|numeric|min:0',
+            'es_vip' => 'sometimes|boolean',
             'estado' => ['sometimes', Rule::in(['activo', 'inactivo'])],
         ];
     }

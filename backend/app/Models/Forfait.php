@@ -21,8 +21,10 @@ class Forfait extends Model
         'nombre',
         'descripcion',
         'precio',
-        'viajes_incluidos',
         'dias_validez',
+        'viajes_incluidos',
+        'distancia_maxima',
+        'es_vip',
         'estado',
     ];
 }

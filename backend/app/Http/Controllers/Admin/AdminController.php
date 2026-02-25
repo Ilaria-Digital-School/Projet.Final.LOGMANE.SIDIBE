@@ -120,27 +120,30 @@ class AdminController extends Controller
     }
 
     /**
-     * [ES] Actualiza el estado de validación de un motorista (ej. aprobar o rechazar documentos).
-     * [FR] Met à jour le statut de validation d'un chauffeur (ex. approuver ou rejeter des documents).
+     * [ES] Actualiza el estado de validación de un motorista (documentación y cuenta).
+     *      Unifica la aprobación de documentos con la activación de la cuenta global.
      *
      * @param UpdateMotoristaStatusRequest $request
-     * @param User $user
+     * @param int $id ID del Usuario (motorista)
      * @return \Illuminate\Http\JsonResponse
      */
     public function updateMotoristaStatus(UpdateMotoristaStatusRequest $request, User $user)
     {
-        if ($user->rol !== 'motorista') {
-            return response()->json(['error' => 'User is not a motorista'], 400);
-        }
-
         try {
-            $motoristaPerfil = $this->motoristaService->updateValidationStatus($user, $request->estado_validacion);
+            // [ES] Usamos el servicio para una validación y actualización atómica
+            $perfil = $this->motoristaService->updateValidationStatus($user, $request->estado_validacion);
+
             return response()->json([
-                'message' => 'Motorista validation status updated successfully',
-                'data' => $motoristaPerfil,
+                'success' => true,
+                'message' => 'Motorista validation status updated and synchronized',
+                'user' => $user->load('motorista_perfil'),
             ]);
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->json(['error' => 'Motorista profile not found'], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Error updating validation status',
+                'message' => $e->getMessage()
+            ], 500);
         }
     }
 
@@ -155,6 +158,21 @@ class AdminController extends Controller
     public function getAllTrips()
     {
         $trips = Viaje::with(['cliente', 'motorista', 'calificacion'])->orderBy('created_at', 'desc')->get();
+        return response()->json($trips);
+    }
+
+    /**
+     * [ES] Recupera solo los viajes activos (solicitado, aceptado, en_curso) 
+     *      con la ubicación en tiempo real de los motoristas para el mapa de admin.
+     * 
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getActiveTrips()
+    {
+        $trips = Viaje::with(['cliente', 'motorista.motorista_perfil'])
+            ->whereIn('estado', ['solicitado', 'aceptado', 'en_curso'])
+            ->get();
+            
         return response()->json($trips);
     }
 
@@ -334,23 +352,38 @@ class AdminController extends Controller
 
     /**
      * [ES] Actualiza el estado de cuenta de un usuario (aprobar/rechazar/pendiente).
-     * [FR] Met à jour le statut du compte d'un utilisateur (approuver/rejeter/en attente).
      *
      * @param Request $request
-     * @param User $user
+     * @param int $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function updateUserStatus(Request $request, User $user)
+    public function updateUserStatus(Request $request, $id)
     {
         $request->validate([
-            'status' => ['required', Rule::in(['pendiente', 'aprobado', 'rechazado'])],
+            'status' => 'required|string|in:pendiente,aprobado,rechazado',
         ]);
 
-        $user->update(['status' => $request->status]);
+        try {
+            $user = User::findOrFail($id);
+            $user->status = $request->status;
+            $user->save();
 
-        return response()->json([
-            'message' => 'User status updated successfully',
-            'user' => $user,
-        ]);
+            // [ES] Si se aprueba al usuario y es un motorista, aprobamos también su perfil de validación automáticamente
+            if ($request->status === 'aprobado' && $user->rol === 'motorista' && $user->motorista_perfil) {
+                $user->motorista_perfil->update(['estado_validacion' => 'aprobado']);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'User status updated successfully',
+                'user' => $user->load('motorista_perfil'),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Error updating user status',
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 }

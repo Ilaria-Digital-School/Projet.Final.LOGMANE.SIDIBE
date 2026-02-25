@@ -37,14 +37,14 @@ class MotoristaLocationUpdated implements ShouldBroadcast
      */
     public function broadcastOn(): array
     {
-        // Only broadcast if there is an active trip
+        $channels = [new PrivateChannel('admin.monitoring')];
+
+        // Only broadcast on trip channel if there is an active trip
         if ($this->viaje) {
-            return [
-                new PrivateChannel('viaje.' . $this->viaje->id),
-            ];
+            $channels[] = new PrivateChannel('viaje.' . $this->viaje->id);
         }
 
-        return []; // Return an empty array if no active trip is found
+        return $channels;
     }
 
     /**

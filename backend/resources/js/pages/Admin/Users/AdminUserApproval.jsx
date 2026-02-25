@@ -13,8 +13,18 @@ const AdminUserApproval = () => {
     const [viewerOpen, setViewerOpen] = useState(false);
     const [selectedDocs, setSelectedDocs] = useState(null);
 
+    // Cargar usuarios al iniciar
     useEffect(() => {
         fetchPendingUsers();
+    }, []);
+
+    // Efecto para cerrar el modal con la tecla Escape
+    useEffect(() => {
+        const handleEsc = (event) => {
+            if (event.key === 'Escape') setViewerOpen(false);
+        };
+        window.addEventListener('keydown', handleEsc);
+        return () => window.removeEventListener('keydown', handleEsc);
     }, []);
 
     const fetchPendingUsers = async () => {
@@ -41,10 +51,14 @@ const AdminUserApproval = () => {
 
     const handleUpdateStatus = async (userId, status) => {
         try {
-            await axios.patch(`/api/admin/users/${userId}/status`, { status });
+            // [ES] Usamos la nueva ruta unificada que aprueba tanto el usuario como el perfil
+            await axios.put(`/api/admin/motorista-perfil/${userId}/validation`, {
+                estado_validacion: status
+            });
             toast.success(t(`admin_dashboard.users.status_updated_${status}`));
             setUsers(prev => Array.isArray(prev) ? prev.filter(u => u.id !== userId) : []);
         } catch (error) {
+            console.error("Error updating status:", error);
             toast.error(t('common.error_updating_status'));
         }
     };
@@ -145,18 +159,27 @@ const AdminUserApproval = () => {
                     </table>
                 </div>
             </Card>
+
+            {/* Modal de visor de documentos */}
             {viewerOpen && selectedDocs && (
-                <div style={{
-                    position: 'fixed',
-                    inset: 0,
-                    backgroundColor: 'rgba(0,0,0,0.75)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    padding: '1.5rem',
-                    zIndex: 100
-                }}>
-                    <div className="mtx-card" style={{ width: '100%', maxWidth: '50rem', maxHeight: '90vh', overflowY: 'auto', textAlign: 'left' }}>
+                <div
+                    onClick={() => setViewerOpen(false)} // Cierra al hacer clic en el fondo
+                    style={{
+                        position: 'fixed',
+                        inset: 0,
+                        backgroundColor: 'rgba(0,0,0,0.75)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        padding: '1.5rem',
+                        zIndex: 100
+                    }}
+                >
+                    <div
+                        className="mtx-card"
+                        onClick={(e) => e.stopPropagation()} // Evita que el clic dentro del modal lo cierre
+                        style={{ width: '100%', maxWidth: '50rem', maxHeight: '90vh', overflowY: 'auto', textAlign: 'left' }}
+                    >
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', borderBottom: '1px solid #e5e7eb', paddingBottom: '1rem' }}>
                             <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>{t('admin_dashboard.motoristas.viewer.title', { name: selectedDocs.name })}</h3>
                             <button onClick={() => setViewerOpen(false)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer' }}>✕</button>

@@ -56,8 +56,27 @@ class MotoristaService
 
     public function updateValidationStatus(User $user, string $estadoValidacion): MotoristaPerfil
     {
-        $motoristaPerfil = MotoristaPerfil::where('usuario_id', $user->id)->firstOrFail();
+        if ($user->rol !== 'motorista') {
+            throw new \Exception('User is not a motorista. Profile required.');
+        }
+
+        $motoristaPerfil = MotoristaPerfil::where('usuario_id', $user->id)->first();
         
+        // [ES] Auto-fix: Si el perfil no existe, lo creamos para que la validación no falle
+        if (!$motoristaPerfil) {
+            $motoristaPerfil = MotoristaPerfil::create([
+                'usuario_id' => $user->id,
+                'estado_actual' => 'inactivo',
+                'viajes_prueba_restantes' => 5,
+                'billetera' => 0,
+                // [ES] Campos obligatorios por esquema DB, usamos placeholders
+                'marca_vehiculo' => 'Generic',
+                'matricula' => 'TEMP-' . $user->id . '-' . time(),
+                'documento_licencia_path' => 'pending_upload',
+            ]);
+            \Illuminate\Support\Facades\Log::info("Auto-created missing profile during validation for driver ID: {$user->id}");
+        }
+
         // [ES] Sincronizamos con el estado de la cuenta principal para que los banners desaparezcan
         $user->update(['status' => $estadoValidacion]);
         

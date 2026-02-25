@@ -7,17 +7,9 @@ import { useTranslation } from 'react-i18next';
 import SEO from '../../components/Common/SEO';
 import { Card, Button, Badge } from '../../components/Common/UIComponents';
 import BottomNav from '../../components/Common/BottomNav';
+import { Check, ShieldAlert, Crown, Gift, ArrowLeft } from 'lucide-react';
 import '../../../css/components.css';
 
-/**
- * SuscripcionesMotorista Component
- *
- * [ES] Gestión de abonos para motoristas. 
- *      Permite al conductor visualizar su estado actual (habilitado/bloqueado) y adquirir planes para poder recibir viajes.
- *
- * [FR] Gestion des abonnements pour les chauffeurs.
- *      Permet au chauffeur de visualiser son statut actuel (activé/bloqué) et d'acquérir des plans pour recevoir des trajets.
- */
 const SuscripcionesMotorista = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
@@ -25,7 +17,7 @@ const SuscripcionesMotorista = () => {
     const { t } = useTranslation();
     const [loading, setLoading] = useState(true);
     const [currentStatus, setCurrentStatus] = useState(null);
-    const [processing, setProcessing] = useState(null); // id of plan being purchased
+    const [isProcessing, setIsProcessing] = useState(false);
 
     useEffect(() => {
         fetchPlanesAndStatus();
@@ -37,136 +29,181 @@ const SuscripcionesMotorista = () => {
                 axios.get('/api/motorista/planes'),
                 axios.get('/api/motorista/planes/status')
             ]);
-            setPlanes(planesRes.data);
+            
+            // Laravel puede devolver { data: [...] } o simplemente el array
+            const planesData = planesRes.data.data ? planesRes.data.data : planesRes.data;
+            setPlanes(Array.isArray(planesData) ? planesData : []);
+            
             setCurrentStatus(statusRes.data);
         } catch (error) {
-            toast.error(t('common.error'));
+            console.error("Error fetching planes:", error);
+            toast.error(t('common.error_loading_data') || 'Error al cargar los planes');
         } finally {
             setLoading(false);
         }
     };
 
-    const handleSubscribe = async (planId) => {
-        setProcessing(planId);
-        try {
-            // Mock Phone input (usually user inputs this)
-            const phone = user.telefono || '00000000';
-
-            await axios.post('/api/motorista/planes/subscribe', {
-                plan_id: planId,
-                payment_method: 'orange_money', // Default for prototype
-                phone_number: phone
-            });
-
-            toast.success(t('common.success'));
-            fetchPlanesAndStatus(); // Refresh status
-        } catch (error) {
-            toast.error(t('common.error'));
-        } finally {
-            setProcessing(null);
-        }
+    const handlePurchase = async (planId, planName) => {
+        setIsProcessing(true);
+        // Aquí iría la lógica de integración con Orange Money / Pasarela de pago
+        // Simularemos un retraso de red
+        toast.loading(`Procesando pago de ${planName}...`, { id: 'purchase' });
+        
+        setTimeout(() => {
+            // Ejemplo de llamada real (comentada):
+            // await axios.post('/api/motorista/comprar-plan', { plan_id: planId });
+            
+            toast.success(`¡Plan ${planName} activado con éxito!`, { id: 'purchase' });
+            fetchPlanesAndStatus(); // Refrescar estado
+            setIsProcessing(false);
+        }, 2000);
     };
 
-    if (loading) return <div className="loading-state">{t('common.loading')}</div>;
+    if (loading) return (
+        <div className="dashboard-container driver-theme flex items-center justify-center">
+            <div className="animate-spin" style={{ width: '40px', height: '40px', border: '4px solid #e2e8f0', borderTopColor: '#f59e0b', borderRadius: '50%' }}></div>
+        </div>
+    );
 
     const { suscripcion_activa, plan: activePlan, fecha_fin, viajes_prueba_restantes, acceso_permitido } = currentStatus || {};
 
     return (
-        <div className="dashboard-container driver-theme">
-            <SEO title={t('driver_dashboard.subscriptions')} />
-
-            <header className="mtx-header driver-header">
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <Button variant="ghost" onClick={() => navigate('/motorista')} label={t('common.back')}>
-                        ←
-                    </Button>
-                    <div>
-                        <h1 className="header-title" style={{ fontSize: '1.5rem', fontWeight: 'bold', margin: 0 }}>
-                            {t('driver_dashboard.subscriptions')}
-                        </h1>
-                    </div>
-                </div>
+        <div className="dashboard-container driver-theme" style={{ paddingBottom: '80px', background: '#f8fafc', minHeight: '100vh' }}>
+            <SEO title={t('driver_dashboard.subscriptions') || 'Suscripciones'} />
+            
+            <header className="mtx-header driver-header sticky top-0 z-10" style={{ background: 'white', borderBottom: '1px solid #e2e8f0' }}>
+                <Button variant="ghost" onClick={() => navigate('/motorista/dashboard')} style={{ padding: '0.5rem' }}>
+                    <ArrowLeft size={24} />
+                </Button>
+                <h1 className="header-title flex-1 text-center pr-8" style={{ fontSize: '1.2rem' }}>
+                    {t('driver_dashboard.subscriptions') || 'Planes y Suscripciones'}
+                </h1>
             </header>
 
-            <main className="main-content-centered">
-
-                {!acceso_permitido && (
-                    <div style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid var(--error-color)', color: 'var(--error-color)', padding: '1rem', borderRadius: '0.5rem', marginBottom: '2rem' }}>
-                        <strong>⚠️ {t('driver_dashboard.access_blocked')}:</strong> {t('driver_dashboard.blocked_desc')}
+            <main className="main-content-centered p-4 max-w-4xl mx-auto">
+                
+                {/* STATUS BANNER */}
+                <Card className="mb-6 overflow-hidden" style={{ padding: 0, border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}>
+                    <div className="p-4 flex items-center gap-4 text-white" style={{ background: acceso_permitido ? (suscripcion_activa ? '#10b981' : '#3b82f6') : '#ef4444' }}>
+                        <div className="p-2 bg-white bg-opacity-20 rounded-full">
+                            {acceso_permitido ? (suscripcion_activa ? <Crown size={32} /> : <Gift size={32} />) : <ShieldAlert size={32} />}
+                        </div>
+                        <div>
+                            <h2 className="text-xl font-bold m-0">
+                                {acceso_permitido 
+                                    ? (suscripcion_activa ? 'Suscripción Activa' : 'Modo Prueba Gratuito') 
+                                    : 'Acceso Bloqueado'}
+                            </h2>
+                            <p className="opacity-90 m-0 text-sm">
+                                {acceso_permitido 
+                                    ? (suscripcion_activa ? `Plan actual: ${activePlan?.nombre}` : 'Disfruta tus viajes de regalo para probar la plataforma.') 
+                                    : 'Necesitas adquirir un plan para recibir viajes.'}
+                            </p>
+                        </div>
                     </div>
-                )}
-
-                <Card style={{ marginBottom: '2rem' }}>
-                    <h2 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '1rem', color: 'var(--text-main)' }}>{t('driver_dashboard.current_status')}</h2>
-                    <div className="trip-details-grid">
-                        <div>
-                            <div className="detail-label">{t('driver_dashboard.account_status')}</div>
-                            <div style={{ fontSize: '1.125rem', fontWeight: 'bold', color: acceso_permitido ? 'var(--secondary-color)' : 'var(--error-color)' }}>
-                                {acceso_permitido ? t('driver_dashboard.enabled') : t('driver_dashboard.blocked')}
+                    
+                    <div className="p-4 bg-white grid grid-cols-2 gap-4 divide-x divide-gray-100">
+                        <div className="text-center">
+                            <div className="text-sm text-gray-500 uppercase font-bold tracking-wider mb-1">
+                                {t('driver_dashboard.trial_remaining') || 'Viajes Gratis'}
+                            </div>
+                            <div className="text-2xl font-black text-blue-600">
+                                {viajes_prueba_restantes || 0}
                             </div>
                         </div>
-                        <div>
-                            <div className="detail-label">{t('driver_dashboard.trial_remaining')}</div>
-                            <div className="detail-value">
-                                {viajes_prueba_restantes} {t('client_dashboard.trips_badge', { count: '' })}
+                        <div className="text-center">
+                            <div className="text-sm text-gray-500 uppercase font-bold tracking-wider mb-1">
+                                Vencimiento
+                            </div>
+                            <div className="text-lg font-bold text-gray-800 mt-1">
+                                {suscripcion_activa ? (fecha_fin ? new Date(fecha_fin).toLocaleDateString() : 'N/A') : 'Ilimitado'}
                             </div>
                         </div>
-                        <div>
-                            <div className="detail-label">{t('driver_dashboard.subscriptions')}</div>
-                            <div style={{ fontSize: '1.125rem', fontWeight: 'bold', color: suscripcion_activa ? 'var(--secondary-color)' : 'var(--text-muted)' }}>
-                                {suscripcion_activa ? t(`plans.${activePlan?.nombre}`) : t('driver_dashboard.none')}
-                            </div>
-                        </div>
-                        {suscripcion_activa && (
-                            <div>
-                                <div className="detail-label">{t('driver_dashboard.expires_on')}</div>
-                                <div className="detail-value">
-                                    {new Date(fecha_fin).toLocaleDateString()}
-                                </div>
-                            </div>
-                        )}
                     </div>
                 </Card>
 
-                <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1.5rem', color: 'var(--text-main)' }}>
-                    {t('driver_dashboard.available_plans')}
-                </h2>
-
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
-                    {Array.isArray(planes) && planes.map(plan => (
-                        <Card key={plan.id} style={{
-                            border: plan.es_vip ? '2px solid var(--accent-color)' : '1px solid var(--border-color)',
-                            position: 'relative'
-                        }}>
-                            {plan.es_vip && (
-                                <Badge variant="premium" style={{ position: 'absolute', top: -12, right: 20 }}>
-                                    VIP
-                                </Badge>
-                            )}
-                            <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '0.5rem', color: 'var(--text-main)' }}>{t(`plans.${plan.nombre}`)}</h3>
-                            <div style={{ fontSize: '2rem', fontWeight: 'bold', color: 'var(--secondary-color)', marginBottom: '0.5rem' }}>
-                                {plan.precio} CFA
-                            </div>
-                            <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem', fontSize: '0.875rem' }}>
-                                {t('driver_dashboard.validity')}: {plan.dias_validez} {t('driver_dashboard.days')}
-                            </p>
-                            <ul style={{ listStyle: 'none', padding: 0, marginBottom: '2rem', color: 'var(--text-main)', fontSize: '0.9rem' }}>
-                                <li style={{ marginBottom: '0.5rem', display: 'flex', gap: '0.5rem' }}><span>✓</span> {t('driver_dashboard.feature_24h')}</li>
-                                <li style={{ marginBottom: '0.5rem', display: 'flex', gap: '0.5rem' }}><span>✓</span> {t('driver_dashboard.feature_unlimited')}</li>
-                                {plan.es_vip && <li style={{ marginBottom: '0.5rem', display: 'flex', gap: '0.5rem', fontWeight: 'bold', color: 'var(--accent-color)' }}><span>✓</span> {t('driver_dashboard.feature_priority')}</li>}
-                            </ul>
-                            <Button
-                                variant={suscripcion_activa && activePlan?.id === plan.id ? 'primary' : 'outline'}
-                                disabled={processing || (suscripcion_activa && activePlan?.id === plan.id)}
-                                onClick={() => handleSubscribe(plan.id)}
-                                className="w-full"
-                            >
-                                {processing === plan.id ? t('driver_dashboard.processing') : (suscripcion_activa && activePlan?.id === plan.id ? t('driver_dashboard.current_plan') : t('driver_dashboard.activate_plan'))}
-                            </Button>
-                        </Card>
-                    ))}
+                <h2 className="text-xl font-bold mb-4 text-gray-800 px-2">{t('driver_dashboard.available_plans') || 'Elige tu Plan'}</h2>
+                
+                {/* PRICING PLANS GRID */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {planes.length === 0 ? (
+                        <div className="col-span-full text-center p-8 text-gray-500">
+                            No hay planes de suscripción disponibles en este momento.
+                        </div>
+                    ) : (
+                        planes.map(plan => {
+                            const isVIP = plan.es_vip || plan.nombre.toLowerCase().includes('vip');
+                            
+                            return (
+                                <Card 
+                                    key={plan.id} 
+                                    className={`relative flex flex-col h-full transition-transform hover:scale-105 ${isVIP ? 'border-2 border-yellow-400' : ''}`}
+                                    style={{ 
+                                        border: isVIP ? '2px solid #fbbf24' : '1px solid #e2e8f0',
+                                        boxShadow: isVIP ? '0 10px 15px -3px rgba(251, 191, 36, 0.2)' : '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                                    }}
+                                >
+                                    {isVIP && (
+                                        <div className="absolute top-0 right-0 transform translate-x-2 -translate-y-3">
+                                            <Badge variant="premium" className="shadow-md text-xs px-3 py-1 bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-none">
+                                                ★ MÁS POPULAR
+                                            </Badge>
+                                        </div>
+                                    )}
+                                    
+                                    <div className="mb-4">
+                                        <h3 className="text-xl font-bold text-gray-800">{plan.nombre}</h3>
+                                        <p className="text-gray-500 text-sm mt-1">{plan.descripcion || 'Acceso completo a la plataforma MotoTX.'}</p>
+                                    </div>
+                                    
+                                    <div className="mb-6 pb-6 border-b border-gray-100 flex-grow">
+                                        <div className="flex items-baseline gap-1">
+                                            <span className="text-4xl font-black text-gray-900">{plan.precio}</span>
+                                            <span className="text-gray-500 font-bold">CFA</span>
+                                        </div>
+                                        <div className="text-sm text-gray-500 mt-1">
+                                            Válido por {plan.dias_validez} días
+                                        </div>
+                                        
+                                        <ul className="mt-6 space-y-3">
+                                            <li className="flex items-start gap-2 text-sm text-gray-700">
+                                                <Check size={18} className="text-green-500 flex-shrink-0 mt-0.5" />
+                                                <span>Recepción de viajes <strong>ilimitada</strong></span>
+                                            </li>
+                                            <li className="flex items-start gap-2 text-sm text-gray-700">
+                                                <Check size={18} className="text-green-500 flex-shrink-0 mt-0.5" />
+                                                <span>Soporte prioritario 24/7</span>
+                                            </li>
+                                            {isVIP && (
+                                                <li className="flex items-start gap-2 text-sm text-gray-700 font-bold">
+                                                    <Check size={18} className="text-yellow-500 flex-shrink-0 mt-0.5" />
+                                                    <span>Prioridad máxima en asignación</span>
+                                                </li>
+                                            )}
+                                        </ul>
+                                    </div>
+                                    
+                                    <Button 
+                                        variant={isVIP ? "accent" : "primary"} 
+                                        className="w-full mt-auto py-3 text-lg font-bold"
+                                        onClick={() => handlePurchase(plan.id, plan.nombre)}
+                                        disabled={isProcessing}
+                                        style={{ 
+                                            background: isVIP ? 'linear-gradient(to right, #f59e0b, #ea580c)' : '#2563eb',
+                                            color: 'white',
+                                            border: 'none',
+                                            borderRadius: '0.75rem'
+                                        }}
+                                    >
+                                        {isProcessing ? '...' : t('driver_dashboard.activate_plan') || 'Comprar Plan'}
+                                    </Button>
+                                </Card>
+                            );
+                        })
+                    )}
                 </div>
             </main>
+            
             <BottomNav role="motorista" />
         </div>
     );

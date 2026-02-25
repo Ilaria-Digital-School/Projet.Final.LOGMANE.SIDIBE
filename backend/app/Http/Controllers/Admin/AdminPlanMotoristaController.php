@@ -21,6 +21,7 @@ class AdminPlanMotoristaController extends Controller
             'precio' => 'required|numeric|min:0',
             'dias_validez' => 'required|integer|min:1',
             'es_vip' => 'required|boolean',
+            'distancia_maxima' => 'nullable|numeric|min:0',
         ]);
 
         $plan = PlanMotorista::create($validated);
@@ -41,6 +42,7 @@ class AdminPlanMotoristaController extends Controller
             'precio' => 'sometimes|required|numeric|min:0',
             'dias_validez' => 'sometimes|required|integer|min:1',
             'es_vip' => 'sometimes|required|boolean',
+            'distancia_maxima' => 'sometimes|numeric|min:0',
         ]);
 
         $plan->update($validated);

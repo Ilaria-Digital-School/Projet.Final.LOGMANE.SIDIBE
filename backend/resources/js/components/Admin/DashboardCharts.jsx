@@ -40,7 +40,7 @@ const DashboardCharts = ({ data }) => {
                     {t('admin_dashboard.charts.income_title')}
                 </h3>
                 <div style={{ height: '300px', minHeight: '300px' }}>
-                    <ResponsiveContainer width="100%" height="100%">
+                    <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                         <LineChart data={data}>
                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
                             <XAxis
@@ -84,7 +84,7 @@ const DashboardCharts = ({ data }) => {
                     {t('admin_dashboard.charts.trips_title')}
                 </h3>
                 <div style={{ height: '300px', minHeight: '300px' }}>
-                    <ResponsiveContainer width="100%" height="100%">
+                    <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                         <BarChart data={data}>
                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
                             <XAxis

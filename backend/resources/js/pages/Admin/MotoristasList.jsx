@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 
 /**
  * MotoristasList Component
@@ -48,16 +49,26 @@ const MotoristasList = () => {
 
     const handleStatusChange = async (id, newStatus) => {
         try {
-            await axios.put(`/api/admin/motoristas/${id}/status`, { estado_validacion: newStatus });
+            const response = await axios.put(`/api/admin/motorista-perfil/${id}/validation`, {
+                estado_validacion: newStatus
+            });
+
+            toast.success(t(`admin_dashboard.users.status_updated_${newStatus}`));
+
             setMotoristas(prev => Array.isArray(prev) ? prev.map(m =>
                 m.id === id ? {
                     ...m,
                     status: newStatus,
-                    motorista_perfil: { ...m.motorista_perfil, estado_validacion: newStatus }
+                    motorista_perfil: {
+                        ...(m.motorista_perfil || {}),
+                        estado_validacion: newStatus
+                    }
                 } : m
             ) : []);
         } catch (error) {
-            toast.error(t('common.error'));
+            console.error("Error updating motorista status:", error);
+            const errorMsg = error.response?.data?.message || t('common.error');
+            toast.error(errorMsg);
         }
     };
 

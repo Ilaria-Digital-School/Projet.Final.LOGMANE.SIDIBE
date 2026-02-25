@@ -46,25 +46,33 @@ class ViajeService
 
     public function acceptTrip(User $motorista, Viaje $viaje): Viaje
     {
-        if ($motorista->rol !== 'motorista') {
-            throw new \Exception('[ES] Prohibido: Solo motoristas pueden aceptar viajes [FR] Interdit: Seuls les motoristes peuvent accepter des voyages');
-        }
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($motorista, $viaje) {
+            // [ES] Bloqueo pesimista para evitar que dos motoristas acepten el mismo viaje
+            // [FR] Verrouillage pessimiste pour éviter que deux chauffeurs n'acceptent le même voyage
+            $viajeLocked = Viaje::where('id', $viaje->id)
+                ->lockForUpdate()
+                ->first();
 
-        $motoristaPerfil = MotoristaPerfil::where('usuario_id', $motorista->id)->first();
-        if (!$motoristaPerfil || $motoristaPerfil->estado_actual !== 'activo') {
-            throw new \Exception('[ES] Motorista no activo o perfil no encontrado [FR] Motoriste non actif ou profil introuvable');
-        }
+            if (!$viajeLocked || $viajeLocked->estado !== 'solicitado' || $viajeLocked->motorista_id !== null) {
+                throw new \Exception('El viaje ya no está disponible o ya ha sido aceptado.');
+            }
 
-        if ($viaje->estado !== 'solicitado' || $viaje->motorista_id !== null) {
-            throw new \Exception('Trip is not available for acceptance');
-        }
+            if ($motorista->rol !== 'motorista') {
+                throw new \Exception('Solo los motoristas pueden aceptar viajes.');
+            }
 
-        $viaje->update([
-            'motorista_id' => $motorista->id,
-            'estado' => 'aceptado',
-        ]);
+            $motoristaPerfil = MotoristaPerfil::where('usuario_id', $motorista->id)->first();
+            if (!$motoristaPerfil || $motoristaPerfil->estado_actual !== 'activo') {
+                throw new \Exception('Motorista no activo o perfil no encontrado.');
+            }
 
-        return $viaje;
+            $viajeLocked->update([
+                'motorista_id' => $motorista->id,
+                'estado' => 'aceptado',
+            ]);
+
+            return $viajeLocked;
+        });
     }
 
     public function updateTripStatus(User $motorista, Viaje $viaje, string $newStatus): Viaje
@@ -121,21 +129,24 @@ class ViajeService
 
     public function cancelarViaje(User $user, Viaje $viaje): Viaje
     {
-        if ($viaje->cliente_id !== $user->id && $viaje->motorista_id !== $user->id) {
-            throw new \Exception('Forbidden: You are not a participant in this trip');
-        }
-
-        if (in_array($viaje->estado, ['completado', 'cancelado'])) {
-            throw new \Exception("Cannot cancel a trip that is already {$viaje->estado}");
-        }
-
         return \Illuminate\Support\Facades\DB::transaction(function () use ($user, $viaje) {
-            // [ES] Devolver el viaje al forfait si estaba en estado 'solicitado' o 'aceptado'
-            // [FR] Retourner le voyage au forfait s'il était en état 'solicitado' ou 'aceptado'
-            if ($viaje->estado === 'solicitado' || $viaje->estado === 'aceptado') {
-                $clienteForfait = ClienteForfait::where('cliente_id', $viaje->cliente_id)
-                    ->where('estado', 'activo')
+            // [ES] Bloqueamos el viaje para realizar una cancelación segura
+            $viajeLocked = Viaje::where('id', $viaje->id)->lockForUpdate()->firstOrFail();
+
+            if ($viajeLocked->cliente_id !== $user->id && $viajeLocked->motorista_id !== $user->id) {
+                throw new \Exception('No tienes permiso para cancelar este viaje.');
+            }
+
+            if (in_array($viajeLocked->estado, ['completado', 'cancelado'])) {
+                throw new \Exception("No se puede cancelar un viaje que ya está {$viajeLocked->estado}.");
+            }
+
+            // [ES] Reembolso: Si el viaje se cancela antes de empezar ('solicitado' o 'aceptado'), devolvemos el viaje al forfait
+            if (in_array($viajeLocked->estado, ['solicitado', 'aceptado'])) {
+                $clienteForfait = ClienteForfait::where('cliente_id', $viajeLocked->cliente_id)
+                    ->where('fecha_expiracion', '>', Carbon::now())
                     ->orderBy('fecha_expiracion', 'asc')
+                    ->lockForUpdate() // Bloqueamos el forfait para el incremento seguro
                     ->first();
 
                 if ($clienteForfait) {
@@ -143,8 +154,9 @@ class ViajeService
                 }
             }
 
-            $viaje->update(['estado' => 'cancelado']);
-            return $viaje;
+            $viajeLocked->update(['estado' => 'cancelado']);
+            
+            return $viajeLocked;
         });
     }
 }
