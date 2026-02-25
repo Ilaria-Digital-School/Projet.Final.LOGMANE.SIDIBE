@@ -118,4 +118,33 @@ class ViajeService
 
         return $viaje;
     }
+
+    public function cancelarViaje(User $user, Viaje $viaje): Viaje
+    {
+        if ($viaje->cliente_id !== $user->id && $viaje->motorista_id !== $user->id) {
+            throw new \Exception('Forbidden: You are not a participant in this trip');
+        }
+
+        if (in_array($viaje->estado, ['completado', 'cancelado'])) {
+            throw new \Exception("Cannot cancel a trip that is already {$viaje->estado}");
+        }
+
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($user, $viaje) {
+            // [ES] Devolver el viaje al forfait si estaba en estado 'solicitado' o 'aceptado'
+            // [FR] Retourner le voyage au forfait s'il était en état 'solicitado' ou 'aceptado'
+            if ($viaje->estado === 'solicitado' || $viaje->estado === 'aceptado') {
+                $clienteForfait = ClienteForfait::where('cliente_id', $viaje->cliente_id)
+                    ->where('estado', 'activo')
+                    ->orderBy('fecha_expiracion', 'asc')
+                    ->first();
+
+                if ($clienteForfait) {
+                    $clienteForfait->increment('viajes_restantes');
+                }
+            }
+
+            $viaje->update(['estado' => 'cancelado']);
+            return $viaje;
+        });
+    }
 }

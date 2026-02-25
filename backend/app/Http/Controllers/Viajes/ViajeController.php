@@ -275,6 +275,29 @@ class ViajeController extends Controller
     }
 
     /**
+     * [ES] Cancela un viaje (solicitado o aceptado).
+     *      Si el viaje estaba solicitado, se devuelve el crédito al cliente.
+     *
+     * @param Request $request
+     * @param Viaje $viaje
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function cancelarViaje(Request $request, Viaje $viaje)
+    {
+        $user = auth()->user();
+
+        try {
+            $cancelledViaje = $this->viajeService->cancelarViaje($user, $viaje);
+            return response()->json([
+                'message' => 'Viaje cancelado con éxito',
+                'data' => $cancelledViaje,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
+    }
+
+    /**
      * [ES] Calcula las ganancias y estadísticas de viajes del conductor para el día y mes actual.
      *      Usa un modelo de precios fijo (ej. 1000 CFA/viaje) para fines de presentación.
      *
@@ -286,34 +309,34 @@ class ViajeController extends Controller
      */
     public function getDriverStats(Request $request)
     {
-        $user = $request->user();
-        if ($user->rol !== 'motorista') {
+        $motorista = auth()->user();
+        if ($motorista->rol !== 'motorista') {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        $today = now()->startOfDay();
-        $month = now()->startOfMonth();
+        $now = now();
+        $startOfDay = $now->copy()->startOfDay();
+        $startOfMonth = $now->copy()->startOfMonth();
 
-        $todayTrips = Viaje::where('motorista_id', $user->id)
+        $todayTrips = Viaje::where('motorista_id', $motorista->id)
             ->where('estado', 'completado')
-            ->where('updated_at', '>=', $today)
+            ->where('updated_at', '>=', $startOfDay)
             ->count();
 
-        $monthTrips = Viaje::where('motorista_id', $user->id)
+        $monthTrips = Viaje::where('motorista_id', $motorista->id)
             ->where('estado', 'completado')
-            ->where('updated_at', '>=', $month)
+            ->where('updated_at', '>=', $startOfMonth)
             ->count();
 
-        // Business Logic: 1000 CFA per trip (Presentation Model)
-        $avgPrice = 1000;
+        $costPerTrip = 1000;
+        $commissionRate = 0.15; // 15% commission saved if premium (example)
 
         return response()->json([
             'today_trips' => $todayTrips,
-            'today_earnings' => $todayTrips * $avgPrice,
-            'month_earnings' => $monthTrips * $avgPrice,
-            'currency' => 'CFA',
-            'commission_saved' => ($todayTrips * $avgPrice) * 0.20 // Show them what they saved (20% typical commission)
+            'month_trips' => $monthTrips,
+            'today_earnings' => $todayTrips * $costPerTrip,
+            'month_earnings' => $monthTrips * $costPerTrip,
+            'commission_saved' => ($monthTrips * $costPerTrip) * $commissionRate,
         ]);
     }
 }
-

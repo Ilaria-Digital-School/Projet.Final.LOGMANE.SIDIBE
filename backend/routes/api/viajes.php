@@ -10,6 +10,7 @@ Route::middleware('jwt.auth')->group(function () {
     Route::get('/pendientes', [ViajeController::class, 'getSolicitedTrips']);
     Route::get('/actual', [ViajeController::class, 'getCurrentTrip']);
     Route::post('/{viaje}/aceptar', [ViajeController::class, 'acceptTrip']);
+    Route::post('/{viaje}/cancelar', [ViajeController::class, 'cancelarViaje']);
     Route::put('/{viaje}/estado', [ViajeController::class, 'updateTripStatus']);
 
     // History

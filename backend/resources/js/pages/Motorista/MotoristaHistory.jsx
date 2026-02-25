@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import SEO from '../../components/Common/SEO';
 import { Card, Button, Badge } from '../../components/Common/UIComponents';
+import BottomNav from '../../components/Common/BottomNav';
 import { LayoutDashboard, History, User, LogOut, Clock, CheckCircle, Calendar, Star, MapPin } from 'lucide-react';
 import '../../../css/components.css';
 

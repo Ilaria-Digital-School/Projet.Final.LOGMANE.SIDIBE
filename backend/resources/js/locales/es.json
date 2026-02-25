@@ -9,6 +9,7 @@
         "subscription_required": "🚫 Acceso denegado: Requiere suscripción",
         "status_updated": "Estado actualizado a: {{status}}",
         "update_error": "Error al actualizar el estado",
+        "online_error_pending": "Tu cuenta está pendiente de aprobación. No puedes ponerte en línea todavía.",
         "driver_role": "Motorista",
         "preferences": "Preferencias",
         "notifications": "Notificaciones Push",

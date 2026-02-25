@@ -14,29 +14,10 @@ import TripPhaseTracker from '../../components/Viaje/TripPhaseTracker';
 import '../../../css/components.css';
 import { Star, LayoutDashboard, History, User, LogOut, Crown } from 'lucide-react';
 
-/**
- * MotoristaDashboard Component
- *
- * [ES] Interfaz dedicada para Conductores (Motoristas).
- *      Funcionalidades Clave: Toggle Online/Offline, Gestión de viajes, Resumen de ganancias.
- *
- * [FR] Interface dédiée pour les Chauffeurs (Motoristas).
- *      Fonctionnalités Clés : Bascule En ligne/Hors ligne, Gestion des voyages, Aperçu des revenus.
- *
- * @component
- */
 const MotoristaDashboard = () => {
     const { logout, user, refreshUser } = useAuth();
     const { t } = useTranslation();
     const navigate = useNavigate();
-
-    // Color system
-    const colors = {
-        primary: '#2563eb',
-        secondary: '#10b981',
-        accent: '#f59e0b',
-        error: '#ef4444'
-    };
 
     const [stats, setStats] = useState(null);
     const [status, setStatus] = useState(null);
@@ -50,28 +31,22 @@ const MotoristaDashboard = () => {
     const [comment, setComment] = useState('');
     const [lastFinishedTripId, setLastFinishedTripId] = useState(null);
     const [isTogglingStatus, setIsTogglingStatus] = useState(false);
-    const [geoError, setGeoError] = useState(null); // [NEW] Geolocation error state
-    // Use a ref for status locking to avoid race conditions with polling
+    const [geoError, setGeoError] = useState(null);
     const statusLockRef = React.useRef(false);
 
     const fetchData = async (isManual = false) => {
         if (!isManual) setLoading(true);
-        // Cache-buster to prevent browser from returning old state
         const ts = Date.now();
         try {
-            // Fetch Stats
             try {
                 const statsRes = await axios.get(`/api/motorista/stats?t=${ts}`);
                 setStats(statsRes.data);
             } catch (e) { }
 
-            // Fetch Profile (Wallet Balance & Status)
             try {
                 const profileRes = await axios.get(`/api/motorista/perfil?t=${ts}`);
                 setProfile(profileRes.data);
 
-                // CRITICAL: Only sync online status IF we aren't currently in a manual toggle
-                // AND we wait a bit longer to ensure the server DB write is fully committed and visible to follow-up GETs
                 if (!statusLockRef.current) {
                     const serverIsOnline = profileRes.data.estado_actual === 'activo';
                     setIsOnline(serverIsOnline);
@@ -97,8 +72,6 @@ const MotoristaDashboard = () => {
         }
     };
 
-    // ... (rest of useEffects) ...
-
     useEffect(() => {
         refreshUser();
         fetchData();
@@ -107,15 +80,14 @@ const MotoristaDashboard = () => {
         const locationInterval = setInterval(() => {
             if ("geolocation" in navigator) {
                 navigator.geolocation.getCurrentPosition(async (position) => {
-                    setGeoError(null); // Clear error on success
+                    setGeoError(null);
                     const { latitude, longitude } = position.coords;
                     try {
                         await axios.put('/api/motorista/ubicacion', { latitude, longitude });
                     } catch (err) {
-                        console.error("[GEO] Failed to update backend with coordinates:", err);
+                        console.error("[GEO] Failed to update backend:", err);
                     }
                 }, (error) => {
-                    console.error("[GEO] Permission or hardware error:", error);
                     setGeoError(error.code === error.PERMISSION_DENIED ? 'denied' : 'error');
                 });
             } else {
@@ -164,70 +136,50 @@ const MotoristaDashboard = () => {
         const newIsOnline = !isOnline;
         const newStatus = newIsOnline ? 'activo' : 'inactivo';
 
-        // 1. Synchronous Lock & Optimistic UI
         statusLockRef.current = true;
         setIsTogglingStatus(true);
         setIsOnline(newIsOnline);
 
-        console.log(`[STATUS] Attempting to toggle status to: ${newStatus}`);
         const promise = axios.put('/api/motorista/status', { estado_actual: newStatus });
 
         toast.promise(promise, {
-            loading: t('common.saving') || 'Actualizando...',
+            loading: t('common.saving'),
             success: (response) => {
-                console.log("[STATUS] Toggle success:", response.data);
                 if (response.data && response.data.data) {
                     setProfile(prev => ({ ...prev, ...response.data.data }));
-                    // Force sync state from server response if possible
                     setIsOnline(response.data.data.estado_actual === 'activo');
                 }
-                const msg = newIsOnline ? t('driver_dashboard.online_msg') : t('driver_dashboard.offline_msg');
-                return msg;
+                return newIsOnline ? t('driver_dashboard.online_msg') : t('driver_dashboard.offline_msg');
             },
             error: (err) => {
-                console.error("[STATUS] Toggle failed:", err.response?.data || err.message);
-                // Revert on error
                 setIsOnline(!newIsOnline);
-
                 const errorMsg = err.response?.data?.error || '';
-
                 if (errorMsg.includes('Subscription required') || err.response?.status === 403) {
-                    console.warn("[STATUS] Subscription required, redirecting...");
-                    // Open a small delay before navigating so user can read toast
                     setTimeout(() => navigate('/motorista/suscripciones'), 2000);
-                    return t('driver_dashboard.subscription_required') || 'Requiere suscripción activa';
+                    return t('driver_dashboard.subscription_required');
                 }
-                return t('driver_dashboard.update_error') || 'Error al actualizar estado';
+                return t('driver_dashboard.update_error');
             },
             finally: () => {
-                setTimeout(() => {
-                    setIsTogglingStatus(false);
-                }, 500);
-                // Keep the polling lock for 12s to allow propagation
-                setTimeout(() => {
-                    statusLockRef.current = false;
-                }, 12000);
+                setTimeout(() => setIsTogglingStatus(false), 500);
+                setTimeout(() => statusLockRef.current = false, 12000);
             }
         });
     };
 
     const handleUpdateStatus = async (newStatus) => {
         if (!currentTrip) return;
-
         try {
             await axios.put(`/api/motorista/viajes/${currentTrip.id}/status`, { estado: newStatus });
-            toast.success(t('driver_dashboard.status_updated', { status: newStatus }));
+            toast.success(t('driver_dashboard.status_updated', { status: t(`status.${newStatus}`) }));
 
             if (newStatus === 'completado') {
-                // Keep a reference for the rating modal before fetchData clears currentTrip
                 setLastFinishedTripId(currentTrip.id);
                 setRatingModalOpen(true);
             }
-
             fetchData();
         } catch (error) {
-            const errorMsg = error.response?.data?.error || error.response?.data?.message || t('driver_dashboard.update_error');
-            toast.error(errorMsg);
+            toast.error(error.response?.data?.error || t('driver_dashboard.update_error'));
         }
     };
 
@@ -266,19 +218,14 @@ const MotoristaDashboard = () => {
             toast.error(t('driver_dashboard.insufficient_funds'));
             return;
         }
-
         try {
-            const res = await axios.post('/api/motorista/retirar', { monto: profile.billetera });
+            await axios.post('/api/motorista/retirar', { monto: profile.billetera });
             toast.success(t('driver_dashboard.withdraw_success'));
             fetchData();
         } catch (error) {
-            toast.error(error.response?.data?.error || 'Error processing withdrawal');
+            toast.error(error.response?.data?.error || t('common.error'));
         }
     };
-
-    // No longer needed: fetchTransactions
-
-    // Simplified: No longer need isMobile state as we use CSS Media Queries
 
     return (
         <div className="dashboard-container driver-theme">
@@ -289,11 +236,9 @@ const MotoristaDashboard = () => {
                 <div className="mtx-header-brand">
                     <img src="/logo.png" alt="MotoTX Logo" className="mtx-header-logo" />
                     <div className="mtx-header-text">
-                        <h1 className="header-title">
-                            MotoTX Motorista
-                        </h1>
+                        <h1 className="header-title">MotoTX</h1>
                         <span className="header-subtitle">
-                            {user?.email === 'motorista@test.com' ? t('auth.role_driver') + ' (Demo)' : user?.name || t('driver_dashboard.driver_role')}
+                            {user?.name || t('driver_dashboard.driver_role')}
                         </span>
                     </div>
                 </div>
@@ -309,30 +254,24 @@ const MotoristaDashboard = () => {
                         ) : (
                             currentTrip ? t('driver_dashboard.in_service') : (isOnline ? t('driver_dashboard.status_online') : t('driver_dashboard.status_offline'))
                         )}
-                        {!currentTrip && !isTogglingStatus && <span className="refresh-icon">↻</span>}
                     </button>
 
                     <Button variant="outline" onClick={() => navigate('/motorista/historial')} className="nav-btn-secondary">
                         {t('client_dashboard.history')}
                     </Button>
-
                     <Button variant="accent" onClick={() => navigate('/motorista/suscripciones')} className="nav-btn-premium">
                         👑 {t('nav.forfaits')}
                     </Button>
-
                     <Button variant="outline" onClick={() => navigate('/motorista/perfil')} className="nav-btn-profile">
                         {t('client_dashboard.profile')}
                     </Button>
-
                     <Button variant="error" onClick={handleLogout} className="nav-btn-logout">
                         {t('common.logout')}
                     </Button>
-
                     <div className="nav-divider"></div>
                     <LanguageSwitcher />
                 </div>
 
-                {/* Mobile Status Badge */}
                 <button
                     className={`mobile-status-toggle ${currentTrip ? 'in-service' : (isOnline ? 'online' : 'offline')} ${isTogglingStatus ? 'is-loading' : ''}`}
                     onClick={toggleStatus}
@@ -341,315 +280,196 @@ const MotoristaDashboard = () => {
                     {isTogglingStatus ? (
                         <div className="animate-spin" style={{ width: '20px', height: '20px', border: '2px solid', borderTopColor: 'transparent', borderRadius: '50%' }}></div>
                     ) : (
-                        currentTrip ? t('driver_dashboard.in_service') : (isOnline ? 'ON' : 'OFF')
+                        currentTrip ? "🟢" : (isOnline ? 'ON' : 'OFF')
                     )}
                 </button>
             </header>
 
-            {/* Mobile Bottom Nav */}
             <nav className="mobile-bottom-nav">
-                <Button variant="ghost" className="active" label={t('nav.dashboard')}>
+                <Button variant="ghost" className="active" onClick={() => navigate('/motorista/dashboard')}>
                     <LayoutDashboard size={20} />
-                    {t('nav.dashboard')}
+                    <span>{t('nav.dashboard')}</span>
                 </Button>
-                <Button variant="ghost" onClick={() => navigate('/motorista/historial')} label={t('client_dashboard.history')}>
+                <Button variant="ghost" onClick={() => navigate('/motorista/historial')}>
                     <History size={20} />
-                    {t('client_dashboard.history')}
+                    <span>{t('client_dashboard.history')}</span>
                 </Button>
-                <Button variant="ghost" onClick={() => navigate('/motorista/suscripciones')} label={t('nav.forfaits')}>
+                <Button variant="ghost" onClick={() => navigate('/motorista/suscripciones')}>
                     <Crown size={20} />
-                    {t('nav.forfaits')}
+                    <span>{t('nav.forfaits')}</span>
                 </Button>
-                <Button variant="ghost" onClick={() => navigate('/motorista/perfil')} label={t('client_dashboard.profile')}>
+                <Button variant="ghost" onClick={() => navigate('/motorista/perfil')}>
                     <User size={20} />
-                    {t('client_dashboard.profile')}
-                </Button>
-                <Button variant="ghost" onClick={handleLogout} label={t('common.logout')} className="text-error">
-                    <LogOut size={20} />
-                    {t('common.logout')}
+                    <span>{t('client_dashboard.profile')}</span>
                 </Button>
             </nav>
 
-            <main className="main-content-centered">
+            <main className="main-content-centered" style={{ paddingBottom: '80px' }}>
                 {geoError && (
-                    <div className="alert alert--error mb-4" style={{
-                        background: '#fee2e2',
-                        color: '#991b1b',
-                        padding: '1rem',
-                        borderRadius: '0.5rem',
-                        border: '1px solid #f87171'
-                    }}>
+                    <div className="alert alert--error mb-4">
                         <strong>⚠️ {t('common.error')}:</strong> {geoError}
                     </div>
                 )}
 
                 {user?.status === 'pendiente' && (
-                    <div className="alert alert--warning mb-4" style={{
-                        background: '#fff7ed',
-                        color: '#9a3412',
-                        padding: '1rem',
-                        borderRadius: '0.5rem',
-                        border: '1px solid #fb923c',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.75rem'
-                    }}>
-                        <span style={{ fontSize: '1.5rem' }}>⏳</span>
-                        <div>
-                            <strong>{t('common.account_pending_title')}</strong>
-                            <p style={{ margin: 0, fontSize: '0.875rem' }}>{t('driver_dashboard.online_error_pending')}</p>
+                    <div className="alert alert--warning mb-4" style={{ background: '#fff7ed', border: '1px solid #fb923c', padding: '1rem', borderRadius: '0.5rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                            <span style={{ fontSize: '1.5rem' }}>⏳</span>
+                            <div>
+                                <strong>{t('common.account_pending_title')}</strong>
+                                <p style={{ margin: 0, fontSize: '0.875rem' }}>{t('common.account_pending_desc')}</p>
+                            </div>
                         </div>
                     </div>
                 )}
 
                 {profile?.viajes_prueba_restantes > 0 && (
-                    <div className="alert alert--info mb-4" style={{
-                        background: '#eff6ff',
-                        color: '#1e40af',
-                        padding: '1rem',
-                        borderRadius: '0.5rem',
-                        border: '1px solid #93c5fd',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between'
-                    }}>
+                    <div className="alert alert--info mb-4" style={{ background: '#eff6ff', border: '1px solid #93c5fd', padding: '1rem', borderRadius: '0.5rem', display: 'flex', justifyContent: 'space-between' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                             <span style={{ fontSize: '1.5rem' }}>🎁</span>
                             <div>
-                                <strong style={{ display: 'block' }}>{t('driver_dashboard.trial_badge')}</strong>
-                                <span style={{ fontSize: '0.875rem' }}>{t('driver_dashboard.trial_desc', { count: profile.viajes_prueba_restantes })}</span>
+                                <strong>Viajes de Prueba</strong>
+                                <span style={{ display: 'block', fontSize: '0.875rem' }}>Te quedan {profile.viajes_prueba_restantes} viajes gratuitos.</span>
                             </div>
                         </div>
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => navigate('/motorista/suscripciones')}
-                            style={{ color: '#2563eb', fontWeight: 'bold' }}
-                        >
-                            {t('driver_dashboard.buy_credits')}
-                        </Button>
                     </div>
                 )}
+
                 {user?.status === 'aprobado' && profile && profile.viajes_prueba_restantes === 0 && !profile.suscripcion_activa && (
-                    <div className="alert alert--warning mb-4" style={{
-                        background: '#fff7ed',
-                        color: '#9a3412',
-                        padding: '1rem',
-                        borderRadius: '0.5rem',
-                        border: '1px solid #fb923c',
-                    }}>
+                    <div className="alert alert--warning mb-4">
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
                             <span style={{ fontSize: '1.5rem' }}>👑</span>
                             <strong>{t('driver_dashboard.access_blocked')}</strong>
                         </div>
                         <p style={{ margin: '0 0 1rem 0', fontSize: '0.875rem' }}>{t('driver_dashboard.blocked_desc')}</p>
-                        <Button
-                            onClick={() => navigate('/motorista/suscripciones')}
-                            className="btn btn--block"
-                            style={{ backgroundColor: '#f97316', color: 'white', border: 'none' }}
-                        >
+                        <Button onClick={() => navigate('/motorista/suscripciones')} className="btn btn--block" style={{ backgroundColor: '#f97316', color: 'white', border: 'none' }}>
                             {t('driver_dashboard.activate_plan')}
                         </Button>
                     </div>
                 )}
+
                 {loading && <div className="loading-state">{t('common.loading')}</div>}
 
-                {/* Wallet Card */}
-
-                {/* Wallet Card */}
-                {
-                    profile && (
-                        <Card className="wallet-card">
-                            <div className="wallet-info">
-                                <div className="wallet-label">{t('driver_dashboard.wallet_title')}</div>
-                                <div className="wallet-amount">
-                                    {profile.billetera} <span className="currency">CFA</span>
-                                </div>
-                                <div className="wallet-desc">{t('driver_dashboard.payout_daily_desc')}</div>
+                {profile && (
+                    <Card className="wallet-card">
+                        <div className="wallet-info">
+                            <div className="wallet-label">{t('driver_dashboard.wallet_title')}</div>
+                            <div className="wallet-amount">
+                                {profile.billetera} <span className="currency">CFA</span>
                             </div>
+                            <div className="wallet-desc">{t('driver_dashboard.payout_daily_desc')}</div>
+                        </div>
 
-                            <div className="wallet-actions">
-                                <Button
-                                    onClick={handleWithdraw}
-                                    disabled={profile.billetera <= 0}
-                                    className="btn btn--block btn--primary"
-                                    style={{ background: 'white', color: 'var(--secondary-color)', border: 'none' }}
-                                >
-                                    💸 {t('driver_dashboard.withdraw_btn')}
+                        <div className="wallet-actions">
+                            <Button onClick={handleWithdraw} disabled={profile.billetera <= 0} className="btn btn--block" style={{ background: 'white', color: '#10b981', border: 'none' }}>
+                                💸 {t('driver_dashboard.withdraw_btn')}
+                            </Button>
+
+                            <div className="stats-row" style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+                                <div className="stat-item" style={{ flex: 1, textAlign: 'center' }}>
+                                    <div className="stat-label">{t('driver_dashboard.trips_today')}</div>
+                                    <div className="stat-value">{stats?.today_trips || 0}</div>
+                                </div>
+                                <div className="stat-item highlight" style={{ flex: 1, textAlign: 'center' }}>
+                                    <div className="stat-label">⚡ {t('driver_dashboard.savings')}</div>
+                                    <div className="stat-value">{stats?.commission_saved || 0} CFA</div>
+                                </div>
+                            </div>
+                        </div>
+                    </Card>
+                )}
+
+                {currentTrip && (
+                    <Card accent className="active-trip-card mt-4">
+                        <h2 className="card-title-active">🚀 {t('client_dashboard.trip_active')}</h2>
+                        <TripPhaseTracker estado={currentTrip.estado} />
+
+                        <div className="trip-details-grid" style={{ marginTop: '1rem' }}>
+                            <div style={{ marginBottom: '1rem' }}>
+                                <strong>{t('client_dashboard.client')}: </strong> {currentTrip.cliente?.name || 'N/A'}
+                            </div>
+                            <div style={{ marginBottom: '1rem' }}>
+                                <strong>📍 {t('client_dashboard.origin')}: </strong> {currentTrip.origen || 'Ubicación de Origen'}
+                            </div>
+                            <div style={{ marginBottom: '1rem' }}>
+                                <strong>🏁 {t('client_dashboard.destination')}: </strong> {currentTrip.destino || 'Destino'}
+                            </div>
+                        </div>
+
+                        <div className="trip-actions" style={{ marginTop: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                            <Button onClick={openGoogleMaps} variant="outline" className="w-full">
+                                🗺️ Navegar con Maps
+                            </Button>
+
+                            {currentTrip.estado === 'aceptado' && (
+                                <Button onClick={() => handleUpdateStatus('en_curso')} className="w-full" variant="primary">
+                                    {t('driver_dashboard.start_trip')}
                                 </Button>
-
-                                <div className="stats-row" style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                                    <Button
-                                        onClick={() => navigate('/motorista/finanzas')}
-                                        className="btn--sm btn--ghost"
-                                        style={{ padding: '0.4rem', color: 'white' }}
-                                    >
-                                        💰 {t('driver_dashboard.view_finances')}
-                                    </Button>
-                                    <div className="stat-item">
-                                        <div className="stat-label">{t('driver_dashboard.trips_today')}</div>
-                                        <div className="stat-value">{stats?.today_trips || 0}</div>
-                                    </div>
-                                    <div className="stat-item highlight">
-                                        <div className="stat-label">⚡ {t('driver_dashboard.savings')}</div>
-                                        <div className="stat-value">{stats?.commission_saved || 0} CFA</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </Card>
-                    )
-                }
-
-                {/* Active Trip */}
-                {
-                    currentTrip && (
-                        <Card accent className="active-trip-card">
-                            <h2 className="card-title-active">🚀 {t('client_dashboard.trip_active')}</h2>
-
-                            <TripPhaseTracker estado={currentTrip.estado} />
-
-                            <div className="trip-details-grid">
-                                <div className="detail-item">
-                                    <div className="detail-label">{t('client_dashboard.client')}</div>
-                                    <div className="detail-value">{currentTrip.cliente?.name || 'N/A'}</div>
-                                </div>
-                                <div className="detail-item">
-                                    <div className="detail-label">{t('client_dashboard.state')}</div>
-                                    <div className="detail-value status-active" style={{ textTransform: 'capitalize' }}>
-                                        {t(`status.${currentTrip.estado}`)}
-                                    </div>
-                                </div>
-                                <div className="detail-item col-span-2">
-                                    <div className="detail-label">📍 {t('client_dashboard.origin')}</div>
-                                    <div className="detail-value">{currentTrip.origen || `${currentTrip.origen_lat}, ${currentTrip.origen_lng}`}</div>
-                                </div>
-                                <div className="detail-item col-span-2">
-                                    <div className="detail-label">🏁 {t('client_dashboard.destination')}</div>
-                                    <div className="detail-value">{currentTrip.destino || `${currentTrip.destino_lat}, ${currentTrip.destino_lng}`}</div>
-                                </div>
-                            </div>
-
-                            <div className="trip-actions">
-                                <Button onClick={openGoogleMaps} variant="outline" className="w-full mb-2">
-                                    🗺️ Navegar con Maps
+                            )}
+                            {currentTrip.estado === 'en_curso' && (
+                                <Button onClick={() => handleUpdateStatus('completado')} className="w-full" style={{ background: '#10b981', color: 'white' }}>
+                                    {t('driver_dashboard.complete_trip')}
                                 </Button>
-
-                                {currentTrip.estado === 'aceptado' && (
-                                    <Button onClick={() => handleUpdateStatus('en_curso')} className="w-full">
-                                        {t('driver_dashboard.start_trip')}
-                                    </Button>
-                                )}
-                                {currentTrip.estado === 'en_curso' && (
-                                    <Button onClick={() => handleUpdateStatus('completado')} variant="secondary" className="w-full">
-                                        {t('driver_dashboard.complete_trip')}
-                                    </Button>
-                                )}
-                            </div>
-                        </Card>
-                    )
-                }
-
-                {
-                    !currentTrip && (
-                        <div className="requests-section">
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                                <h2 className="section-title" style={{ margin: 0 }}>📋 {t('driver_dashboard.pending_requests')}</h2>
-                                <Button
-                                    onClick={fetchData}
-                                    variant="ghost"
-                                    style={{ fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
-                                >
-                                    🔄 {t('common.refresh')}
-                                </Button>
-                            </div>
-                            {(Array.isArray(viajes) && viajes.length === 0) ? (
-                                <Card className="empty-state">
-                                    <div className="empty-icon">🔍</div>
-                                    <p className="empty-text">{t('driver_dashboard.no_requests')}</p>
-                                </Card>
-                            ) : (
-                                <div className="requests-grid">
-                                    {Array.isArray(viajes) && viajes.map((viaje) => (
-                                        <Card key={viaje.id} className="request-item-card">
-                                            <div className="request-header">
-                                                <div>
-                                                    <div className="detail-label">{t('client_dashboard.client')}</div>
-                                                    <div className="detail-value" style={{ fontWeight: 'bold' }}>{viaje.cliente?.name || 'N/A'}</div>
-                                                </div>
-                                                <Badge variant="accent">{t('driver_dashboard.new_tag')}</Badge>
-                                            </div>
-
-                                            <div className="request-body" style={{ margin: '0.75rem 0', fontSize: '0.85rem' }}>
-                                                <div style={{ color: 'var(--text-muted)', marginBottom: '0.25rem' }}>
-                                                    📍 <span style={{ color: 'var(--text-main)' }}>{viaje.origen || t('common.loading')}</span>
-                                                </div>
-                                                <div style={{ color: 'var(--text-muted)' }}>
-                                                    🏁 <span style={{ color: 'var(--text-main)' }}>{viaje.destino || t('common.loading')}</span>
-                                                </div>
-                                            </div>
-
-                                            <Button onClick={() => handleAcceptTrip(viaje.id)} className="w-full">
-                                                {t('driver_dashboard.accept_trip')}
-                                            </Button>
-                                        </Card>
-                                    ))}
-                                </div>
                             )}
                         </div>
-                    )
-                }
-            </main >
+                    </Card>
+                )}
 
-            {/* Rating Modal */}
-            {
-                ratingModalOpen && (
-                    <div style={{
-                        position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-                        backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
-                    }}>
-                        <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: '0.5rem', width: '90%', maxWidth: '400px' }}>
-                            <h3 className="text-lg font-bold mb-4">{t('driver_dashboard.rating_modal.title')}</h3>
+                {!currentTrip && (
+                    <div className="requests-section mt-4">
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                            <h2 style={{ fontSize: '1.2rem', margin: 0 }}>📋 {t('driver_dashboard.pending_requests')}</h2>
+                            <Button onClick={fetchData} variant="ghost" size="sm">🔄</Button>
+                        </div>
 
-                            <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginBottom: '1.5rem' }}>
-                                {[1, 2, 3, 4, 5].map((star) => (
-                                    <button
-                                        key={star}
-                                        onClick={() => setRating(star)}
-                                        className="btn btn--ghost"
-                                        style={{ border: 'none', padding: '0.25rem' }}
-                                    >
-                                        <Star
-                                            size={36}
-                                            fill={star <= rating ? "#f59e0b" : "none"}
-                                            stroke={star <= rating ? "#f59e0b" : "#cbd5e1"}
-                                            style={{ transition: 'transform 0.2s' }}
-                                        />
-                                    </button>
+                        {(Array.isArray(viajes) && viajes.length === 0) ? (
+                            <Card className="empty-state text-center" style={{ padding: '2rem' }}>
+                                <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>🔍</div>
+                                <p>{t('driver_dashboard.no_requests')}</p>
+                            </Card>
+                        ) : (
+                            <div className="requests-grid" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                {Array.isArray(viajes) && viajes.map((viaje) => (
+                                    <Card key={viaje.id}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                                            <strong>{viaje.cliente?.name || 'Cliente'}</strong>
+                                            <Badge variant="accent">{t('driver_dashboard.new_tag')}</Badge>
+                                        </div>
+                                        <div style={{ fontSize: '0.9rem', marginBottom: '1rem', color: '#64748b' }}>
+                                            <div style={{ marginBottom: '0.5rem' }}>📍 {viaje.origen || 'Origen'}</div>
+                                            <div>🏁 {viaje.destino || 'Destino'}</div>
+                                        </div>
+                                        <Button onClick={() => handleAcceptTrip(viaje.id)} className="w-full" variant="primary">
+                                            {t('driver_dashboard.accept_trip')}
+                                        </Button>
+                                    </Card>
                                 ))}
                             </div>
+                        )}
+                    </div>
+                )}
+            </main>
 
-                            <textarea
-                                value={comment}
-                                onChange={(e) => setComment(e.target.value)}
-                                placeholder={t('driver_dashboard.rating_modal.placeholder')}
-                                className="w-full p-2 border rounded mb-4"
-                                rows="3"
-                            />
-
-                            <div className="flex justify-end gap-2 mt-4">
-                                <Button variant="ghost" onClick={() => setRatingModalOpen(false)}>
-                                    {t('common.cancel')}
-                                </Button>
-                                <Button variant="primary" onClick={submitRatingOnly}>
-                                    {t('driver_dashboard.rating_modal.submit')}
-                                </Button>
-                            </div>
+            {ratingModalOpen && (
+                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+                    <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: '0.5rem', width: '90%', maxWidth: '400px' }}>
+                        <h3 className="text-lg font-bold mb-4">{t('driver_dashboard.rating_modal.title')}</h3>
+                        <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginBottom: '1.5rem' }}>
+                            {[1, 2, 3, 4, 5].map((star) => (
+                                <button key={star} onClick={() => setRating(star)} style={{ border: 'none', background: 'none' }}>
+                                    <Star size={36} fill={star <= rating ? "#f59e0b" : "none"} stroke={star <= rating ? "#f59e0b" : "#cbd5e1"} />
+                                </button>
+                            ))}
+                        </div>
+                        <textarea value={comment} onChange={(e) => setComment(e.target.value)} placeholder={t('driver_dashboard.rating_modal.placeholder')} style={{ width: '100%', padding: '0.5rem', border: '1px solid #e2e8f0', borderRadius: '0.5rem', marginBottom: '1rem' }} rows="3" />
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
+                            <Button variant="ghost" onClick={() => setRatingModalOpen(false)}>{t('common.cancel')}</Button>
+                            <Button variant="primary" onClick={submitRatingOnly}>{t('driver_dashboard.rating_modal.submit')}</Button>
                         </div>
                     </div>
-                )
-            }
-            <BottomNav role="motorista" />
-        </div >
+                </div>
+            )}
+        </div>
     );
 };
 
