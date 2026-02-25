@@ -42,10 +42,6 @@ class MotoristaPlanController extends Controller
             'suscripcion_activa' => $activeSubscription ? true : false,
             'plan' => $activeSubscription ? $activeSubscription->plan : null,
             'fecha_fin' => $activeSubscription ? $activeSubscription->fecha_fin : null,
-            
-            // Debug info
-            'server_time' => now()->toDateTimeString(),
-            'debug_access' => $perfil->hasAccess()
         ]);
     }
 

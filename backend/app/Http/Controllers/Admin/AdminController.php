@@ -328,7 +328,7 @@ class AdminController extends Controller
      */
     public function getPendingUsers()
     {
-        $users = User::where('status', 'pendiente')->orderBy('created_at', 'desc')->get();
+        $users = User::with('motorista_perfil')->where('status', 'pendiente')->orderBy('created_at', 'desc')->get();
         return response()->json($users);
     }
 

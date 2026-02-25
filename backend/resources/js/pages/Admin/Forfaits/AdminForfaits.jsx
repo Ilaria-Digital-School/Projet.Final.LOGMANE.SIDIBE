@@ -58,11 +58,20 @@ const AdminForfaits = () => {
         e.preventDefault();
         try {
             const endpoint = activeTab === 'clientes' ? '/api/admin/forfaits' : '/api/admin/motorista-plans';
+
+            // Clean data
+            const cleanData = {
+                ...formData,
+                precio: parseFloat(formData.precio),
+                dias_validez: parseInt(formData.dias_validez),
+                viajes_incluidos: activeTab === 'clientes' ? parseInt(formData.viajes_incluidos) : 0
+            };
+
             if (editingForfait) {
-                await axios.put(`${endpoint}/${editingForfait.id}`, formData);
+                await axios.put(`${endpoint}/${editingForfait.id}`, cleanData);
                 toast.success(t('admin_dashboard.forfaits.save_success'));
             } else {
-                await axios.post(endpoint, formData);
+                await axios.post(endpoint, cleanData);
                 toast.success(t('admin_dashboard.forfaits.save_success'));
             }
             setModalOpen(false);
@@ -70,7 +79,9 @@ const AdminForfaits = () => {
             resetForm();
             fetchData();
         } catch (error) {
-            toast.error(t('common.error'));
+            console.error('Error saving plan:', error.response?.data || error.message);
+            const errorMsg = error.response?.data?.message || t('common.error');
+            toast.error(errorMsg);
         }
     };
 

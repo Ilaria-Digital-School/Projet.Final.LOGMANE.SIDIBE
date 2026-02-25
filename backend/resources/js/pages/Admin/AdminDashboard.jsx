@@ -54,25 +54,19 @@ const AdminDashboard = () => {
                 axios.get('/api/admin/chart-data')
             ]);
 
-            console.log('Dashboard stats:', statsRes.data);
-            console.log('Chart data:', chartRes.data);
-
             setStats(statsRes.data);
 
             // Ensure chartData is always an array
             if (Array.isArray(chartRes.data)) {
                 setChartData(chartRes.data);
             } else if (chartRes.data && typeof chartRes.data === 'object') {
-                console.warn('API returned object for chart data, converting to array');
                 setChartData(Object.values(chartRes.data));
             } else {
-                console.error('API returned invalid chart data format:', chartRes.data);
                 setChartData([]);
             }
 
         } catch (error) {
             console.error('Error fetching dashboard statistics:', error);
-            // Optional: set dummy stats or error state
         } finally {
             setLoading(false);
         }
@@ -131,7 +125,8 @@ const AdminDashboard = () => {
             value: stats.totalMotoristas,
             icon: '🏍️',
             color: colors.secondary,
-            badge: stats.motoristasPendientes > 0 ? t('admin_dashboard.stats.drivers_pending', { count: stats.motoristasPendientes }) : null
+            badge: stats.motoristasPendientes > 0 ? t('admin_dashboard.stats.drivers_pending', { count: stats.motoristasPendientes }) : null,
+            onClick: () => navigate('/admin/motoristas')
         },
         {
             title: t('admin_dashboard.stats.trips_today'),
@@ -146,14 +141,16 @@ const AdminDashboard = () => {
             value: `${Math.round(stats.ingresosMes).toLocaleString()} CFA`,
             icon: '💰',
             color: colors.accent,
-            subtitle: t('admin_dashboard.stats.forfaits_sold')
+            subtitle: t('admin_dashboard.stats.forfaits_sold'),
+            onClick: () => navigate('/admin/reportes')
         },
         {
             title: t('admin_dashboard.stats.active_users'),
             value: stats.usuariosActivos,
             icon: '👥',
             color: colors.purple,
-            subtitle: `${t('admin_dashboard.stats.average_rating')}: ${stats.ratingPromedio}⭐`
+            subtitle: `${t('admin_dashboard.stats.average_rating')}: ${stats.ratingPromedio}⭐`,
+            onClick: () => navigate('/admin/clientes')
         }
     ] : [];
 

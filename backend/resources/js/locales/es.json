@@ -106,6 +106,8 @@
         "approve": "Aprobar",
         "reject": "Rechazar",
         "search": "Buscar...",
+        "view": "Ver",
+        "close": "Cerrar",
         "error_loading_data": "Error al cargar los datos",
         "error_updating_status": "Error al actualizar el estado",
         "account_pending_title": "Cuenta en Revisión",
@@ -288,11 +290,18 @@
             },
             "actions": {
                 "approve": "Aprobar",
-                "reject": "Rechazar"
+                "reject": "Rechazar",
+                "view_docs": "Ver Documentos"
             },
             "info": {
                 "vehicle": "Vehículo",
                 "plate": "Matrícula"
+            },
+            "viewer": {
+                "title": "Verificación de Documentos: {{name}}",
+                "dni": "Documento de Identidad (DNI/NINA)",
+                "license": "Carnet de Conducir / Licencia",
+                "no_file": "Archivo no cargado"
             }
         },
         "clients": {

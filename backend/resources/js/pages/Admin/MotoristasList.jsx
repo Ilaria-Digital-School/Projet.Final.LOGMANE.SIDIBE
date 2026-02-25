@@ -15,6 +15,8 @@ const MotoristasList = () => {
     const { t } = useTranslation();
     const [motoristas, setMotoristas] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [viewerOpen, setViewerOpen] = useState(false);
+    const [selectedDocs, setSelectedDocs] = useState(null);
 
     useEffect(() => {
         fetchMotoristas();
@@ -117,6 +119,20 @@ const MotoristasList = () => {
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <button
+                                            onClick={() => {
+                                                setSelectedDocs({
+                                                    name: motorista.name,
+                                                    dni: motorista.documento_identidad_path,
+                                                    license: motorista.motorista_perfil?.documento_licencia_path
+                                                });
+                                                setViewerOpen(true);
+                                            }}
+                                            className="btn btn--sm btn--ghost mr-2"
+                                            title={t('admin_dashboard.motoristas.actions.view_docs')}
+                                        >
+                                            📄 {t('common.view')}
+                                        </button>
                                         {motorista.motorista_perfil?.estado_validacion !== 'aprobado' && (
                                             <button
                                                 onClick={() => handleStatusChange(motorista.id, 'aprobado')}
@@ -196,6 +212,64 @@ const MotoristasList = () => {
                             </div>
                         </div>
                     ))}
+                </div>
+            )}
+            {viewerOpen && selectedDocs && (
+                <div style={{
+                    position: 'fixed',
+                    inset: 0,
+                    backgroundColor: 'rgba(0,0,0,0.75)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '1.5rem',
+                    zIndex: 100
+                }}>
+                    <div className="mtx-card" style={{ width: '100%', maxWidth: '50rem', maxHeight: '90vh', overflowY: 'auto' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', borderBottom: '1px solid #e5e7eb', paddingBottom: '1rem' }}>
+                            <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>{t('admin_dashboard.motoristas.viewer.title', { name: selectedDocs.name })}</h3>
+                            <button onClick={() => setViewerOpen(false)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer' }}>✕</button>
+                        </div>
+
+                        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '1.5rem' }}>
+                            <div>
+                                <h4 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '0.75rem', color: '#4b5563' }}>🪪 {t('admin_dashboard.motoristas.viewer.dni')}</h4>
+                                {selectedDocs.dni ? (
+                                    <div style={{ borderRadius: '0.5rem', overflow: 'hidden', border: '1px solid #e5e7eb' }}>
+                                        <img
+                                            src={selectedDocs.dni.startsWith('http') ? selectedDocs.dni : `/storage/${selectedDocs.dni}`}
+                                            alt="DNI"
+                                            style={{ width: '100%', height: 'auto', display: 'block' }}
+                                        />
+                                    </div>
+                                ) : (
+                                    <div style={{ padding: '2rem', textAlign: 'center', backgroundColor: '#f3f4f6', borderRadius: '0.5rem', color: '#6b7280' }}>
+                                        {t('admin_dashboard.motoristas.viewer.no_file')}
+                                    </div>
+                                )}
+                            </div>
+                            <div>
+                                <h4 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '0.75rem', color: '#4b5563' }}>🏍️ {t('admin_dashboard.motoristas.viewer.license')}</h4>
+                                {selectedDocs.license ? (
+                                    <div style={{ borderRadius: '0.5rem', overflow: 'hidden', border: '1px solid #e5e7eb' }}>
+                                        <img
+                                            src={selectedDocs.license.startsWith('http') ? selectedDocs.license : `/storage/${selectedDocs.license}`}
+                                            alt="Licencia"
+                                            style={{ width: '100%', height: 'auto', display: 'block' }}
+                                        />
+                                    </div>
+                                ) : (
+                                    <div style={{ padding: '2rem', textAlign: 'center', backgroundColor: '#f3f4f6', borderRadius: '0.5rem', color: '#6b7280' }}>
+                                        {t('admin_dashboard.motoristas.viewer.no_file')}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end' }}>
+                            <button onClick={() => setViewerOpen(false)} className="btn btn--primary">{t('common.close')}</button>
+                        </div>
+                    </div>
                 </div>
             )}
         </div>
