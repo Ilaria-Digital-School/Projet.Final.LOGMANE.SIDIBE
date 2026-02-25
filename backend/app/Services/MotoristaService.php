@@ -34,10 +34,12 @@ class MotoristaService
             \Illuminate\Support\Facades\Log::info("Auto-created missing profile for driver ID: {$user->id}");
         }
         
-        // [ES] Si intenta ponerse online, verificamos acceso (viajes de prueba o suscripción)
+        /* 
+        // [ES] TEMP DISABLE FOR DEMO: Evitamos el bloqueo por falta de suscripción
         if ($estadoActual === 'activo' && !$motoristaPerfil->hasAccess()) {
             throw new \Exception('Subscription required to go online');
         }
+        */
 
         $motoristaPerfil->update(['estado_actual' => $estadoActual]);
         return $motoristaPerfil;
