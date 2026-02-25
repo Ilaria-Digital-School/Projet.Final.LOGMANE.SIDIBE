@@ -8,6 +8,7 @@ import InstallPrompt from '../../components/Common/InstallPrompt';
 import { useTranslation } from 'react-i18next';
 import SEO from '../../components/Common/SEO';
 import { Card, Button, Badge, Modal } from '../../components/Common/UIComponents';
+import BottomNav from '../../components/Common/BottomNav';
 import LanguageSwitcher from '../../components/Common/LanguageSwitcher';
 import TripPhaseTracker from '../../components/Viaje/TripPhaseTracker';
 import '../../../css/components.css';
@@ -647,6 +648,7 @@ const MotoristaDashboard = () => {
                     </div>
                 )
             }
+            <BottomNav role="motorista" />
         </div >
     );
 };

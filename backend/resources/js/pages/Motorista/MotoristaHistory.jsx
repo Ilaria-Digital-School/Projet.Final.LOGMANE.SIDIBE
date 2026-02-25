@@ -115,32 +115,7 @@ const MotoristaHistory = () => {
             </header>
 
             {/* Mobile Bottom Nav */}
-            <nav className="mobile-bottom-nav">
-                <Button variant="ghost" onClick={() => navigate('/motorista')} label="Dashboard">
-                    <LayoutDashboard size={20} />
-                    {t('nav.dashboard')}
-                </Button>
-                <Button variant="ghost" className="active" label={t('client_dashboard.history')}>
-                    <History size={20} />
-                    {t('client_dashboard.history')}
-                </Button>
-                <Button variant="ghost" onClick={() => navigate('/motorista/perfil')} label={t('client_dashboard.profile')}>
-                    <User size={20} />
-                    {t('client_dashboard.profile')}
-                </Button>
-                <Button
-                    variant="ghost"
-                    onClick={() => {
-                        logout();
-                        navigate('/');
-                    }}
-                    label={t('common.logout')}
-                    className="text-error"
-                >
-                    <LogOut size={20} />
-                    {t('common.logout')}
-                </Button>
-            </nav>
+            <BottomNav role="motorista" />
 
             <main className="main-content-centered">
                 {/* Premium Stats Row */}

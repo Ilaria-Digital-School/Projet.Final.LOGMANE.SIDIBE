@@ -121,24 +121,7 @@ const ClienteProfile = () => {
             </header>
 
             {/* ─── Mobile Bottom Nav ─── */}
-            <nav className="mobile-bottom-nav">
-                <Button variant="ghost" onClick={() => navigate('/cliente')} label={t('nav.dashboard')}>
-                    <span style={{ fontSize: '1.25rem' }}>🏠</span>
-                    {t('nav.dashboard')}
-                </Button>
-                <Button variant="ghost" onClick={() => navigate('/cliente/historial')} label={t('client_dashboard.history')}>
-                    <span style={{ fontSize: '1.25rem' }}>📋</span>
-                    {t('client_dashboard.history')}
-                </Button>
-                <Button variant="ghost" className="active" label={t('client_dashboard.profile')}>
-                    <span style={{ fontSize: '1.25rem' }}>👤</span>
-                    {t('client_dashboard.profile')}
-                </Button>
-                <Button variant="ghost" onClick={handleLogout} label={t('common.logout')} className="text-error">
-                    <span style={{ fontSize: '1.25rem' }}>🚪</span>
-                    {t('common.logout')}
-                </Button>
-            </nav>
+            <BottomNav role="cliente" />
 
             {/* ─── Main Content ─── */}
             <main className="main-content-centered" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(22rem, 1fr))', gap: '1.5rem', paddingTop: '1.5rem' }}>

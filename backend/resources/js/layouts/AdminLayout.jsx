@@ -89,24 +89,9 @@ const AdminLayout = () => {
                     <Outlet />
                 </main>
 
-                {/* MOBILE BOTTOM NAV - PERSISTENT IN ALL ADMIN SUB-PAGES */}
-                <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex justify-around p-3 shadow-lg z-50">
-                    <Link to="/admin" className="flex flex-col items-center text-indigo-600">
-                        <span className="text-xl">📊</span>
-                        <span className="text-xs mt-1">{t('nav.dashboard')}</span>
-                    </Link>
-                    <Link to="/admin/viajes" className="flex flex-col items-center text-gray-500">
-                        <span className="text-xl">📋</span>
-                        <span className="text-xs mt-1">{t('client_dashboard.history')}</span>
-                    </Link>
-                    <Link to="/admin/perfil" className="flex flex-col items-center text-gray-500">
-                        <span className="text-xl">👤</span>
-                        <span className="text-xs mt-1">{t('client_dashboard.profile')}</span>
-                    </Link>
-                    <button onClick={handleLogout} className="flex flex-col items-center text-red-500">
-                        <span className="text-xl">🚪</span>
-                        <span className="text-xs mt-1">{t('common.logout')}</span>
-                    </button>
+                {/* MOBILE BOTTOM NAV - UNIFIED COMPONENT */}
+                <div className="md:hidden">
+                    <BottomNav role="admin" />
                 </div>
             </div>
         </div>

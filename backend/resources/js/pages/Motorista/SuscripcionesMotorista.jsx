@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import SEO from '../../components/Common/SEO';
 import { Card, Button, Badge } from '../../components/Common/UIComponents';
+import BottomNav from '../../components/Common/BottomNav';
 import '../../../css/components.css';
 
 /**
@@ -166,6 +167,7 @@ const SuscripcionesMotorista = () => {
                     ))}
                 </div>
             </main>
+            <BottomNav role="motorista" />
         </div>
     );
 };

@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next';
 import { Card, Button, Badge } from '../../components/Common/UIComponents';
 import LanguageSwitcher from '../../components/Common/LanguageSwitcher';
 import TripPhaseTracker from '../../components/Viaje/TripPhaseTracker';
+import BottomNav from '../../components/Common/BottomNav';
 import { Star } from 'lucide-react';
 import '../../../css/components.css';
 
@@ -813,6 +814,7 @@ const ClienteDashboard = () => {
                     />
                 </div>
             </main>
+            <BottomNav role="cliente" />
         </div>
     );
 };
