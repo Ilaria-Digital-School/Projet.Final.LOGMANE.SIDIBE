@@ -83,7 +83,9 @@ const MotoristaDashboard = () => {
             toast.success("Estado actualizado");
             fetchData();
         } catch (error) {
-            toast.error("Error al actualizar estado");
+            const errorMsg = error.response?.data?.error || error.response?.data?.message || "Error al actualizar estado";
+            toast.error("Error: " + errorMsg);
+            console.error("Update trip status error:", error.response || error);
         }
     };
 

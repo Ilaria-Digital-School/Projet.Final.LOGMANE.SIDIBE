@@ -76,7 +76,11 @@ class ViajeController extends Controller
             );
 
             // Broadcast new trip request to motoristas
-            ViajeSolicitado::dispatch($viaje);
+            try {
+                ViajeSolicitado::dispatch($viaje);
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::error('WS Error: ' . $e->getMessage());
+            }
 
             return response()->json([
                 'message' => 'Trip requested successfully',
@@ -231,14 +235,18 @@ class ViajeController extends Controller
             $acceptedViaje = $this->viajeService->acceptTrip($motorista, $viaje);
 
             // Notify client that trip was accepted
-            ViajeAceptado::dispatch($acceptedViaje);
+            try {
+                ViajeAceptado::dispatch($acceptedViaje);
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::error('WS Error: ' . $e->getMessage());
+            }
 
             return response()->json([
                 'message' => 'Trip accepted successfully',
                 'data' => $acceptedViaje,
             ]);
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return response()->json(['error' => $e->getMessage()], 400);
         }
     }
@@ -262,14 +270,18 @@ class ViajeController extends Controller
             $updatedViaje = $this->viajeService->updateTripStatus($motorista, $viaje, $request->estado);
 
             // Notify client of status change
-            ViajeActualizado::dispatch($updatedViaje);
+            try {
+                ViajeActualizado::dispatch($updatedViaje);
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::error('WS Error: ' . $e->getMessage());
+            }
 
             return response()->json([
                 'message' => "Trip status updated to {$request->estado}",
                 'data' => $updatedViaje,
             ]);
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return response()->json(['error' => $e->getMessage()], 400);
         }
     }
@@ -292,7 +304,7 @@ class ViajeController extends Controller
                 'message' => 'Viaje cancelado con éxito',
                 'data' => $cancelledViaje,
             ]);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return response()->json(['error' => $e->getMessage()], 400);
         }
     }
