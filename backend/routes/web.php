@@ -92,11 +92,6 @@ Route::get('/debug-data', function () {
 // Admin Reports Route
 Route::get('/reports/monthly', [\App\Http\Controllers\Admin\ReportController::class, 'generateMonthlyReport']);
 
-// React App Catch-all (exclude API and PWA files)
-Route::get('/{any?}', function () {
-    return view('welcome');
-})->where('any', '^(?!api|sw.js|manifest.webmanifest|build).*$');
-
 Route::get('/generar-test', function () {
     $m = App\Models\User::updateOrCreate(
         ['email' => 'moto_test@mtx.com'],
@@ -118,3 +113,9 @@ Route::get('/generar-test', function () {
 
     return "Cuentas Listas! - Moto: moto_test@mtx.com | Cliente: cliente_test@mtx.com (Pass: password123)";
 });
+
+// React App Catch-all (exclude API and PWA files)
+Route::get('/{any?}', function () {
+    return view('welcome');
+})->where('any', '^(?!api|sw.js|manifest.webmanifest|build).*$');
+
