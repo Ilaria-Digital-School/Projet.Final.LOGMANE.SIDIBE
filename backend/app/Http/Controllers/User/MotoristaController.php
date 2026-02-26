@@ -46,6 +46,7 @@ class MotoristaController extends Controller
         } catch (ModelNotFoundException $e) {
             return response()->json(['error' => 'Motorista profile not found'], 404);
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error toggle status motorista: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
             if (str_contains($e->getMessage(), 'Subscription required')) {
                 return response()->json(['error' => $e->getMessage()], 403);
             }

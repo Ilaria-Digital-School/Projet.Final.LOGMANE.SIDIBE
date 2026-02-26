@@ -348,6 +348,7 @@ const ClienteDashboard = () => {
                     />
                 </div>
             </main>
+            <BottomNav role="cliente" />
         </div>
     );
 };
