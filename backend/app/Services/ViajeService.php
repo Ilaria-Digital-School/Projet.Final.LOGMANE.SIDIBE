@@ -48,35 +48,10 @@ class ViajeService
         });
     }
 
-    public function acceptTrip(User $motorista, Viaje $viaje): Viaje
+    public function acceptTrip(\App\Models\User $motorista, \App\Models\Viaje $viaje): \App\Models\Viaje
     {
-        return \Illuminate\Support\Facades\DB::transaction(function () use ($motorista, $viaje) {
-            // [ES] Bloqueo pesimista para evitar que dos motoristas acepten el mismo viaje
-            // [FR] Verrouillage pessimiste pour éviter que deux chauffeurs n'acceptent le même voyage
-            $viajeLocked = Viaje::where('id', $viaje->id)
-                ->lockForUpdate()
-                ->first();
-
-            if (!$viajeLocked || $viajeLocked->estado !== 'solicitado' || $viajeLocked->motorista_id !== null) {
-                throw new \Exception('El viaje ya no está disponible o ya ha sido aceptado.');
-            }
-
-            if ($motorista->rol !== 'motorista') {
-                throw new \Exception('Solo los motoristas pueden aceptar viajes.');
-            }
-
-            $motoristaPerfil = MotoristaPerfil::where('usuario_id', $motorista->id)->first();
-            if (!$motoristaPerfil || $motoristaPerfil->estado_actual !== 'activo') {
-                throw new \Exception('Motorista no activo o perfil no encontrado.');
-            }
-
-            $viajeLocked->update([
-                'motorista_id' => $motorista->id,
-                'estado' => 'aceptado',
-            ]);
-
-            return $viajeLocked;
-        });
+        $viaje->update(['motorista_id' => $motorista->id, 'estado' => 'aceptado']);
+        return $viaje;
     }
 
     public function updateTripStatus(User $motorista, Viaje $viaje, string $newStatus): Viaje

@@ -14,34 +14,11 @@ use App\Events\MotoristaLocationUpdated;
  */
 class MotoristaService
 {
-    public function updateStatus(User $user, string $estadoActual): MotoristaPerfil
-    {
-        // [ES] Verificamos si la cuenta principal está aprobada por el admin
-        if ($user->status !== 'aprobado') {
-            throw new \Exception('Account pending approval. Please contact support.');
+    public function updateStatus(\App\Models\User $user, string $estadoActual): \App\Models\MotoristaPerfil {
+        $motoristaPerfil = \App\Models\MotoristaPerfil::where('usuario_id', $user->id)->first();
+        if ($motoristaPerfil) {
+            $motoristaPerfil->update(['estado_actual' => $estadoActual]);
         }
-
-        $motoristaPerfil = MotoristaPerfil::where('usuario_id', $user->id)->first();
-        
-        // [ES] Auto-fix: Si el perfil no existe, lo creamos con 5 viajes de prueba
-        if (!$motoristaPerfil) {
-            $motoristaPerfil = MotoristaPerfil::create([
-                'usuario_id' => $user->id,
-                'estado_actual' => 'inactivo',
-                'viajes_prueba_restantes' => 5,
-                'billetera' => 0,
-            ]);
-            \Illuminate\Support\Facades\Log::info("Auto-created missing profile for driver ID: {$user->id}");
-        }
-        
-        /* 
-        // [ES] TEMP DISABLE FOR DEMO: Evitamos el bloqueo por falta de suscripción
-        if ($estadoActual === 'activo' && !$motoristaPerfil->hasAccess()) {
-            throw new \Exception('Subscription required to go online');
-        }
-        */
-
-        $motoristaPerfil->update(['estado_actual' => $estadoActual]);
         return $motoristaPerfil;
     }
 
