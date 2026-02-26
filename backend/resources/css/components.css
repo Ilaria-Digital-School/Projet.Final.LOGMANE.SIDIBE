@@ -441,8 +441,18 @@
         font-weight: 800;
     }
 
-    .mobile-bottom-nav .btn span {
-        font-size: 1.4rem !important;
+    .mobile-bottom-nav .btn .nav-label {
+        font-size: 0.65rem !important;
+        margin-top: 2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 100%;
+        text-align: center;
+    }
+
+    /* Estilo para el icono */
+    .mobile-bottom-nav .btn svg {
         margin-bottom: 2px;
     }
 
