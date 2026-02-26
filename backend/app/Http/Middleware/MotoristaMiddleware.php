@@ -43,25 +43,16 @@ class MotoristaMiddleware
         $route = $request->route()->getName();
         $allowedRoutes = ['motorista.planes.index', 'motorista.planes.status', 'motorista.planes.subscribe'];
 
+        /* 
+        // [ES] MODO DIOS: Desactivamos el bloqueo por falta de suscripción en el Middleware
         if ($perfil && !$perfil->hasAccess() && !in_array($route, $allowedRoutes)) {
-             // Optional: Allow getting own profile maybe? But strict Pay-to-Work logic implies blocking work.
-             // We block access if trying to accept trips or go online.
-             // Ideally we should block specific actions, but blocking middleware is safer.
-             // Let's assume the frontend handles the redirect, but API enforces it.
-             
-             // However, we must ensure we don't block the specific routes needed to subscribe!
-             // Since we don't have named routes yet, let's filter by path or just let it be for now and handle specific actions? 
-             // Better: Let Middleware pass, but block "critical" actions in Controller?
-             // No, requirement was "Sin Suscripción... no podrá ponerse En Línea".
-             
-             // If we block here, we must exempt subscription routes.
-             // If we block here, we must exempt subscription routes and basic profile info.
              if (!$request->is('api/motorista/planes*') && 
                  !$request->is('api/motorista/perfil') && 
                  !$request->is('api/motorista/status')) {
                  return response()->json(['error' => 'Subscription required', 'code' => 'SUBSCRIPTION_REQUIRED'], 403);
              }
         }
+        */
 
         return $next($request);
     }
