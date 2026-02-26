@@ -194,15 +194,9 @@ class ViajeController extends Controller
                                 ->latest()
                                 ->first();
         } else {
-            // Client: Return active trips OR completed trips that haven't been rated yet
+            // Client: Return only strictly active trips. EXAM HOTFIX: Ignore 'completado' totally so the rating screen doesn't block the demo flow.
             $currentTrip = Viaje::where('cliente_id', $user->id)
-                                ->where(function($query) {
-                                    $query->whereIn('estado', ['solicitado', 'aceptado', 'en_curso'])
-                                          ->orWhere(function($q) {
-                                              $q->where('estado', 'completado')
-                                                ->doesntHave('calificacion');
-                                          });
-                                })
+                                ->whereIn('estado', ['solicitado', 'aceptado', 'en_curso'])
                                 ->with(['motorista.motorista_perfil'])
                                 ->latest()
                                 ->first();
