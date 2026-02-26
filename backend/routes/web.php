@@ -139,6 +139,34 @@ Route::get('/ver-errores', function () {
     return response("<pre>" . htmlspecialchars($content) . "</pre>")->header('Content-Type', 'text/html');
 });
 
+Route::get('/crear-mi-perfil', function () {
+    try {
+        $motorista = \App\Models\User::where('email', 'moto_test@mtx.com')->first();
+        if (!$motorista) {
+            return "El usuario moto_test@mtx.com no existe. Ejecuta /generar-test primero.";
+        }
+
+        $perfil = \App\Models\MotoristaPerfil::firstOrCreate(
+            ['usuario_id' => $motorista->id],
+            [
+                'marca_vehiculo' => 'Honda test',
+                'matricula' => 'TEST-001',
+                'documento_licencia_path' => 'demo_path',
+                'estado_actual' => 'inactivo',
+                'estado_validacion' => 'aprobado',
+                'billetera' => 5000,
+                'viajes_prueba_restantes' => 10
+            ]
+        );
+
+        $motorista->update(['status' => 'aprobado']);
+
+        return "¡Perfil de motorista creado con éxito para {$motorista->email}! Ya puedes darle al botón de ON.";
+    } catch (\Exception $e) {
+        return "Error creando perfil: " . $e->getMessage();
+    }
+});
+
 // React App Catch-all (exclude API and PWA files)
 Route::get('/{any?}', function () {
     return view('welcome');
